@@ -1,2 +1,2 @@
-mod contract;
 mod base32;
+mod contract;

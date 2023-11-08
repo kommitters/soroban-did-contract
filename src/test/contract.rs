@@ -1,5 +1,5 @@
-use crate::contract::{ DIDContract, DIDContractClient };
-use soroban_sdk::{ testutils::Address as _, Address, Env, String };
+use crate::contract::{DIDContract, DIDContractClient};
+use soroban_sdk::{testutils::Address as _, Address, Env, String};
 
 fn create_contract() -> (Env, DIDContractClient<'static>) {
     let e: Env = Default::default();
@@ -12,14 +12,15 @@ fn create_contract() -> (Env, DIDContractClient<'static>) {
 fn test_initialize() {
     let (e, did_contract) = create_contract();
 
-    let result = did_contract.initialize(
-        &Address::random(&e),
-        &String::from_slice(&e, "chaincerts")
-    );
+    let result =
+        did_contract.initialize(&Address::random(&e), &String::from_slice(&e, "chaincerts"));
 
     let encoded_msi_len = 24;
 
-    assert_eq!(result.len() as usize, "did:chaincerts:".len() + encoded_msi_len);
+    assert_eq!(
+        result.len() as usize,
+        "did:chaincerts:".len() + encoded_msi_len
+    );
 }
 
 #[test]

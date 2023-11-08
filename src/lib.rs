@@ -5,10 +5,10 @@ mod base32;
 mod contract;
 mod did_trait;
 mod did_uri;
+mod error;
 mod service;
 mod storage;
 mod verification_method;
-mod error;
 
 #[cfg(test)]
 mod test;
