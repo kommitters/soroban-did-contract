@@ -1,6 +1,6 @@
-use crate::service::Service;
-use crate::verification_method::VerificationMethod;
-use soroban_sdk::{Address, Env, String, Vec};
+// use crate::service::Service;
+// use crate::verification_method::VerificationMethod;
+use soroban_sdk::{Address, Env, String};
 
 pub trait DIDTrait {
     /// Initializes the DID Contract by generating the DID URI, setting the admin, and storing the DID attributes.
@@ -9,19 +9,19 @@ pub trait DIDTrait {
         e: Env,
         admin: Address,
         did_method: String,
-        context: Vec<String>,
-        verification_methods: Vec<VerificationMethod>,
-        services: Vec<Service>,
+        // context: Vec<String>,
+        // verification_methods: Vec<VerificationMethod>,
+        // services: Vec<Service>,
     ) -> String;
 
-    /// Updates the DID attributes. This function can only be called by the admin.
-    fn update_did(
-        e: Env,
-        context: Vec<String>,
-        verification_methods: Vec<VerificationMethod>,
-        services: Vec<Service>,
-    );
+    // Updates the DID attributes. This function can only be called by the admin.
+    // fn update_did(
+    //     e: Env,
+    //     context: Vec<String>,
+    //     verification_methods: Vec<VerificationMethod>,
+    //     services: Vec<Service>,
+    // );
 
-    /// Returns the DID attributes: Context, DID URI, Verification Methods, and Services.
-    fn get_did(e: Env) -> (Vec<String>, String, Vec<VerificationMethod>, Vec<Service>);
+    // /// Returns the DID attributes: Context, DID URI, Verification Methods, and Services.
+    // fn get_did(e: Env) -> (Vec<String>, String, Vec<VerificationMethod>, Vec<Service>);
 }
