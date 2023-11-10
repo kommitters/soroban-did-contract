@@ -34,6 +34,27 @@ fn concat_did_uri(e: &Env, did_method: &String, method_specific_id: &[u8]) -> St
     String::from_slice(e, str_did_uri)
 }
 
+pub fn concat_field_id(
+    env: &Env,
+    did_uri: &String,
+    id: &String,
+) -> String {
+    let hash_str = String::from_slice(&env, &"#");
+
+    let did_uri_len = did_uri.len() as usize;
+    let id_len = id.len() as usize;
+    let combined_len = did_uri_len + id_len + 1;
+
+    let mut slice: [u8; 100] = [0; 100]; // should be big enough for both strings combined
+    did_uri.copy_into_slice(&mut slice[..did_uri_len]);
+    hash_str.copy_into_slice(&mut slice[did_uri_len..did_uri_len + 1]);
+    id.copy_into_slice(&mut slice[(did_uri_len + 1)..combined_len]);
+
+    let id_string = String::from_slice(&env, core::str::from_utf8(&slice[..combined_len]).unwrap());
+
+    id_string
+}
+
 fn get_random_bytes(e: &Env) -> [u8; 15] {
     let mut random_bytes = [0u8; 15];
 
