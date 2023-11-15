@@ -7,5 +7,5 @@ pub enum ContractError {
     AlreadyInitialized = 1,
     NotAuthorized = 2,
     EmptyContext = 3,
-    EmptyVerificationMethod = 4
+    EmptyVerificationMethods = 4
 }

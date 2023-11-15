@@ -1,13 +1,20 @@
 use crate::did_trait::DIDTrait;
 use crate::did_uri;
 use crate::error::ContractError;
+use crate::service::{format_services, Service};
 use crate::storage;
-use crate::service::Service;
-use crate::verification_method::{VerificationMethod, Controller};
-use soroban_sdk::{ contract, contractimpl, panic_with_error, Address, Env, String, Vec };
+use crate::verification_method::{format_verification_method, VerificationMethod};
+use soroban_sdk::{
+    contract, contractimpl, contractmeta, panic_with_error, Address, Env, String, Vec,
+};
 
 const LEDGERS_THRESHOLD: u32 = 1;
 const LEDGERS_TO_EXTEND: u32 = 535_000;
+
+contractmeta!(
+    key = "Description",
+    val = "Smart contract for decentralized identifiers (DIDs)",
+);
 
 #[contract]
 pub struct DIDContract;
@@ -30,11 +37,9 @@ impl DIDTrait for DIDContract {
         let did_uri = did_uri::generate(&e, &did_method);
         storage::write_did_uri(&e, &did_uri);
 
-        // verify empty vectors
-        verify_context(&e, &context);
-        verify_verification_methods(&e, &verification_methods);
-
-        update_did_attributes(&e, Some(context), Some(verification_methods), Some(services), &did_uri);
+        set_context(&e, &context);
+        set_verification_methods(&e, &verification_methods, &did_uri);
+        set_services(&e, &services, &did_uri);
 
         e.storage()
             .instance()
@@ -51,15 +56,23 @@ impl DIDTrait for DIDContract {
         services: Option<Vec<Service>>,
     ) {
         let contract_admin = storage::read_admin(&e);
-        if contract_admin == admin {
-            admin.require_auth();
-        }
-        else {
+        if contract_admin != admin {
             panic_with_error!(e, ContractError::NotAuthorized)
         }
+        admin.require_auth();
+
         let did_uri = storage::read_did_uri(&e);
 
-        update_did_attributes(&e, context, verification_methods, services, &did_uri);
+        // Update only the fields that are not None
+        if let Some(context) = context {
+            set_context(&e, &context)
+        }
+        if let Some(verification_methods) = verification_methods {
+            set_verification_methods(&e, &verification_methods, &did_uri)
+        }
+        if let Some(services) = services {
+            set_services(&e, &services, &did_uri)
+        }
     }
 
     fn get_did(e: Env) -> (Vec<String>, String, Vec<VerificationMethod>, Vec<Service>) {
@@ -72,53 +85,27 @@ impl DIDTrait for DIDContract {
     }
 }
 
-fn update_did_attributes(
-        e: &Env,
-        context: Option<Vec<String>>,
-        verification_methods: Option<Vec<VerificationMethod>>,
-        services: Option<Vec<Service>>,
-        did_uri: &String,
-    ) {
-        if let Some(context_vec) = context {
-            verify_context(e, &context_vec);
-            storage::write_context(&e, &context_vec);
-        }
-
-        if let Some(verification_methods_vec) = verification_methods {
-            verify_verification_methods(e, &verification_methods_vec);
-            let mut updated_verification_methods: Vec<VerificationMethod> = Vec::new(&e);
-
-            for mut verification_method in verification_methods_vec.iter() {
-                verification_method.id = did_uri::concat_field_id(&e, &did_uri, &verification_method.id);
-                if verification_method.controller.len() == 0 {
-                    // verification_method.controller = Controller::Some(did_uri.clone()); // Cuando se especifica a Controller con el typo de verification_method.controller
-                    verification_method.controller = did_uri.clone();
-
-                }
-                updated_verification_methods.push_back(verification_method);
-            }
-            storage::write_verification_methods(&e, &updated_verification_methods);
-        }
-
-        if let Some(services_vec) = services {
-            let mut updated_services: Vec<Service> = Vec::new(&e);
-
-            for mut service in services_vec.iter() {
-                service.id = did_uri::concat_field_id(&e, &did_uri, &service.id);
-                updated_services.push_back(service);
-            }
-            storage::write_services(&e, &updated_services);
-        }
-}
-
-fn verify_context(e: &Env, context: &Vec<String>) {
+fn set_context(e: &Env, context: &Vec<String>) {
     if context.is_empty() {
         panic_with_error!(e, ContractError::EmptyContext);
     }
+    storage::write_context(e, context);
 }
 
-fn verify_verification_methods(e: &Env, verification_methods: &Vec<VerificationMethod>) {
+fn set_verification_methods(
+    e: &Env,
+    verification_methods: &Vec<VerificationMethod>,
+    did_uri: &String,
+) {
     if verification_methods.is_empty() {
-        panic_with_error!(e, ContractError::EmptyVerificationMethod);
+        panic_with_error!(e, ContractError::EmptyVerificationMethods);
     }
+
+    let new_verification_methods = format_verification_method(e, verification_methods, did_uri);
+    storage::write_verification_methods(e, &new_verification_methods);
+}
+
+fn set_services(e: &Env, services: &Vec<Service>, did_uri: &String) {
+    let new_services: Vec<Service> = format_services(e, services, did_uri);
+    storage::write_services(e, &new_services);
 }

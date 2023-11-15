@@ -1,5 +1,5 @@
-use crate::service::Service;
 use crate::verification_method::VerificationMethod;
+use crate::service::Service;
 use soroban_sdk::{contracttype, Address, Env, String, Vec};
 
 #[derive(Clone)]
