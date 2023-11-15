@@ -36,8 +36,7 @@ jobs:
         uses: actions-rs/tarpaulin@v0.1
         with:
           version: 0.22.0
-          args: --all-features --out Lcov
-          # args: --all-features --fail-under 98.0 --out Lcov
+          args: --all-features --fail-under 99.0 --out Lcov
       - name: Upload to Coveralls
         uses: coverallsapp/github-action@master
         with:
