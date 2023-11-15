@@ -6,4 +6,6 @@ use soroban_sdk::contracterror;
 pub enum ContractError {
     AlreadyInitialized = 1,
     NotAuthorized = 2,
+    EmptyContext = 3,
+    EmptyVerificationMethods = 4,
 }
