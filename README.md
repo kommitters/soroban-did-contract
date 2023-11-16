@@ -6,7 +6,9 @@
 [![Coverage Status](https://img.shields.io/coveralls/github/kommitters/soroban-did-contract?style=for-the-badge)](https://coveralls.io/github/kommitters/soroban-did-contract)
 [![OSSF-Scorecard Score](https://img.shields.io/ossf-scorecard/github.com/kommitters/soroban-did-contract?label=openssf%20scorecard&style=for-the-badge)](https://api.securityscorecards.dev/projects/github.com/kommitters/soroban-did-contract)
 
-Soroban Smart Contract for Decentralized Identifiers (DIDs) that adheres to the [W3C DIDs v1.0 specification][w3c-did-core]. The **DID Contract** allows to manage a decentralized digital identity within the Soroban & Stellar ecosystem.
+Soroban Smart Contract for Decentralized Identifiers (DIDs) that adheres to the [W3C DIDs v1.0 specification][w3c-did-core].
+
+The **DID Contract** allows to manage a decentralized digital identity within the Soroban & Stellar ecosystem.
 
 ## Smart Contract Function Parameters
 
@@ -16,7 +18,8 @@ This section describes the parameters and corresponding structures used in the s
 
 The address of the smart contract administrator. The admin is the only account that can update the DID attributes, and it is set during the initialization of the smart contract.
 
-Example:
+**Example**
+
 ```
 GDDOIBULGMONQSKPTCGL7B67UYLBIO45UTJFHSQOO3M56BC6AGKGZPNO
 ```
@@ -24,45 +27,103 @@ GDDOIBULGMONQSKPTCGL7B67UYLBIO45UTJFHSQOO3M56BC6AGKGZPNO
 
 ### `did_method`: `String`
 
-The DID method name is a string which will be used to create the DID URI.
+The DID method name is a string which will be used to create the DID URI. See [DID Syntax][did-syntax] for more details.
 
-Example:
+**Example**
+
 ```rust
 "chaincerts"
 ```
 
 ### `context`: `Vec<String>`
-A vector of strings representing the context of the smart contract.
-    - Example:
-        ```rust
-        ["https://www.w3.org/ns/did/v1", "https://w3id.org/security/suites/ed25519-2020/v1", "https://w3id.org/security/suites/x25519-2020/v1"]
-        ```
-- `verification_methods`: `Vec<VerificationMethod>` - A vector of `VerificationMethod` structures defining verification methods.
-    - Verification method structure:
-        - `id`: `String` - This will be concatenated with the DID URI to create an ID, for example: `did:chaincerts:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#verification_method_id`.
-        - `type_`: `VerificationMethodType` - Allowed values: `Ed25519VerificationKey2020`, `X25519KeyAgreementKey2020`.
-        - `controller`: `String` - An empty string is allowed. In such cases, the value in the storage will be set as the DID URI.
-        - `public_key_multibase`: `String`
-        - `verification_relationships`: `Vec<VerificationRelationship>` - Allowed values: `Authentication`, `AssertionMethod`, `KeyAgreement`, `CapabilityInvocation`, `CapabilityDelegation`.
-    - Example:
-        ```rust
-        [{"id": "keys-1", "type_": "Ed25519VerificationKey2020", "controller": "", "public_key_multibase": "z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ", "verification_relationships": ["Authentication", "Assertion"]}]
-        ```
-- `services`: `Vec<Service>` - A vector of `Service` structures representing services associated with the smart contract.
-    - Service method structure:
-        - `id`: `String` - This will be concatenated with the DID URI to create an ID, for example:  `did:chaincerts:zEYJrMxWigf9boyeJMTRN4Ern8DJMoCXaLK77pzQmxVjf#service_id`.
-        - `type_`: `ServiceType` -  Allowed values: `LinkedDomain`, `DIDCom`, `DIDCommMessagin`, `CredentialRegistr`, `OID4VC`, `OID4VP`.
-        - `service_endpoint`: `String`.
-    - Example:
-        ```rust
-        [{"id": "chaincerts", "type_": "LinkedDomains", "service_endpoint": "https://chaincerts.co"}]
-        ```
+
+The context is a list of URLs that usually define the version of the W3C DID specification used by the DID document, and the suites used as verification methods.
+
+**Example**
+
+```rust
+[
+  "https://www.w3.org/ns/did/v1",
+  "https://w3id.org/security/suites/ed25519-2020/v1",
+  "https://w3id.org/security/suites/x25519-2020/v1"
+]
+```
+
+### `verification_methods`: `Vec<VerificationMethod>`
+
+A DID document can express verification methods, such as cryptographic public keys, which can be used to authenticate or authorize interactions with the DID subject or associated parties. See [Verification Methods][verification-methods] for more details.
+
+Verification Methods are represented as a vector of `VerificationMethod` structures.
+
+
+**`VerificationMethod`**:
+  - `id`: `String` — Identifier for the Verification Method. It is a concatenated string that contains the DID URI followed by a hash (#) and the specific id of the verification method. For the `initialize` and `update_did` functions, only the specific id of the verification method is expected, while for the `get_did` function, the entire concatenated id will be returned. Example:
+    ```rust
+    // Expected in `initialize` and `update_did`
+    "keys-1"
+
+    // Returned value in `get_did`.
+    "did:chaincerts:vyfrxab6umfxddlzl62jktu7#keys-1"
+    ```
+  - `type_`: `VerificationMethodType` — Allowed values: `Ed25519VerificationKey2020`, `X25519KeyAgreementKey2020`.
+  - `controller`: `String` — DID URI. An empty string is allowed, in which case the own DID URI will be set as the controller.
+  - `public_key_multibase`: `String` — The public key encoded in Multibase format (Base58BTC encoded).
+  - `verification_relationships`: `Vec<VerificationRelationship>` — Allowed values: `Authentication`, `AssertionMethod`, `KeyAgreement`, `CapabilityInvocation`, `CapabilityDelegation`.
+
+**Example**
+
+```rust
+[
+  {
+    "id": "keys-1",
+    "type_": "Ed25519VerificationKey2020",
+    "controller": "",
+    "public_key_multibase": "z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ",
+    "verification_relationships": [
+      "Authentication",
+      "Assertion"
+    ]
+  }
+]
+```
+
+
+### `services`: `Vec<Service>`
+
+Services are used in DID documents to express ways of communicating with the DID subject or associated entities. A service can be any type of service the DID subject wants to advertise, including decentralized identity management services for further discovery, authentication, authorization, or interaction. See [DID Services][did-services] for more details.
+
+The services are represented as a vector of `Service` structures.
+
+**`Service`**:
+  - `id`: `String` — Identifier for the Service. It is a concatenated string that contains the DID URI followed by a hash (#) and the specific id of the service. For the `initialize` and `update_did` functions, only the specific id of the service is expected, while for the `get_did` function, the entire concatenated id will be returned. Example:
+    ```rust
+    // Expected in `initialize` and `update_did`
+    "chaincerts"
+
+    // Returned value in `get_did`.
+    "did:chaincerts:vyfrxab6umfxddlzl62jktu7#chaincerts"
+    ```
+  - `type_`: `ServiceType` — Allowed values: `LinkedDomains`, `DIDComm`, `DIDCommMessaging`, `CredentialRegistry`, `OID4VCI`, `OID4VP`.
+  - `service_endpoint`: `String` — The service endpoint URL.
+
+
+**Example**
+
+```rust
+[
+  {
+    "id": "chaincerts",
+    "type_": "LinkedDomains",
+    "service_endpoint": "https://chaincerts.co"
+  }
+]
+```
 
 ## Smart Contract Functions
 
 ### Initialize
 
-Initializes the DID Contract by generating the DID URI, setting the contract admin, and storing the DID attributes: context, verification methods, and services. DID URI is generated by concatenating the DID method name and a pseudo-random value encoded in Base32.
+Initializes the DID Contract by generating the DID URI, setting the contract admin, and storing the DID attributes: context, verification methods, and services. The DID URI is generated by concatenating the DID method name and a pseudo-random value encoded in Base32.
 
 Returns the DID URI as a string.
 
@@ -154,6 +215,16 @@ soroban contract invoke \
 [["https://www.w3.org/ns/did/v1","https://w3id.org/security/suites/ed25519-2020/v1"],"did:chaincerts:vyfrxab6umfxddlzl62jktu7",[{"controller":"did:chaincerts:vyfrxab6umfxddlzl62jktu7","id":"did:chaincerts:vyfrxab6umfxddlzl62jktu7#keys-1","public_key_multibase":"z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ","type_":"Ed25519VerificationKey2020","verification_relationships":["Authentication","Assertion"]}],[{"id":"did:chaincerts:vyfrxab6umfxddlzl62jktu7#chaincerts","service_endpoint":"https://chaincerts.co","type_":"LinkedDomains"},{"id":"did:chaincerts:vyfrxab6umfxddlzl62jktu7#chaincerts_vault","service_endpoint":"https://vault.chaincerts.co","type_":"LinkedDomains"}]]
 ```
 
+## Contract Errors
+
+| Code | Error | Description |
+| --- | --- | --- |
+| 1 | `AlreadyInitialized` | Contract already initialized
+| 2 | `NotAuthorized` | Invoker is not the contract admin
+| 3 | `EmptyContext` | Context provided is an empty vector
+| 4 | `EmptyVerificationMethods` | Verification Methods provided is an empty vector
+
+
 ## Development
 
 ### Pre-requirements
@@ -224,3 +295,6 @@ Made with 💙 by [kommitters Open Source](https://kommit.co)
 [contributing]: https://github.com/kommitters/soroban-did-contract/blob/main/CONTRIBUTING.md
 [w3c-did-core]: https://www.w3.org/TR/did-core/
 [soroban-setup]: https://soroban.stellar.org/docs/getting-started/setup
+[did-syntax]: https://www.w3.org/TR/did-core/#did-syntax
+[verification-methods]: https://www.w3.org/TR/did-core/#verification-methods
+[did-services]: https://www.w3.org/TR/did-core/#services
