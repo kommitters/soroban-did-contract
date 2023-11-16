@@ -1,7 +1,10 @@
 # Soroban DID Contract
 
-![License Badge](https://img.shields.io/github/license/kommitters/soroban-did-contract?style=for-the-badge)
-[![OSSF-Scorecard Score](https://img.shields.io/ossf-scorecard/github.com/kommitters/soroban-did-contract?style=for-the-badge)](https://api.securityscorecards.dev/projects/github.com/kommitters/soroban-did-contract)
+[![Release Badge](https://img.shields.io/github/v/release/kommitters/soroban-did-contract?style=for-the-badge)](https://github.com/kommitters/soroban-did-contract/releases)
+[![License Badge](https://img.shields.io/github/license/kommitters/soroban-did-contract?style=for-the-badge)](https://github.com/kommitters/soroban-did-contract/blob/main/LICENSE)
+![Build Badge](https://img.shields.io/github/actions/workflow/status/kommitters/soroban-did-contract/ci.yml?branch=main&style=for-the-badge)
+[![Coverage Status](https://img.shields.io/coveralls/github/kommitters/soroban-did-contract?style=for-the-badge)](https://coveralls.io/github/kommitters/soroban-did-contract)
+[![OSSF-Scorecard Score](https://img.shields.io/ossf-scorecard/github.com/kommitters/soroban-did-contract?label=openssf%20scorecard&style=for-the-badge)](https://api.securityscorecards.dev/projects/github.com/kommitters/soroban-did-contract)
 
 Soroban Smart Contract for Decentralized Identifiers (DIDs) that adheres to the [W3C DIDs v1.0 specification][w3c-did-core]. The **DID Contract** allows to manage a decentralized digital identity within the Soroban & Stellar ecosystem.
 
