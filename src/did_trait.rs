@@ -14,7 +14,7 @@ pub trait DIDTrait {
         services: Vec<Service>,
     ) -> String;
 
-    // Updates the DID attributes. This function can only be called by the admin.
+    /// Updates the DID attributes. This function can only be called by the admin.
     fn update_did(
         e: Env,
         admin: Address,
@@ -23,6 +23,6 @@ pub trait DIDTrait {
         services: Option<Vec<Service>>,
     );
 
-    // Returns the DID attributes: Context, DID URI, Verification Methods, and Services.
+    /// Returns the DID attributes: Context, DID URI, Verification Methods, and Services.
     fn get_did(e: Env) -> (Vec<String>, String, Vec<VerificationMethod>, Vec<Service>);
 }
