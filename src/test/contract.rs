@@ -3,7 +3,7 @@ use crate::verification_method::{
     format_verification_method, VerificationMethod, VerificationMethodType,
     VerificationRelationship,
 };
-use soroban_sdk::{testutils::Address as _, vec, Address, String};
+use soroban_sdk::{testutils::Address as _, vec, Address, String, Vec};
 
 // Length of the Method Specific ID (MSI) encoded in Base32
 const ENCODED_MSI_LEN: usize = 24;
@@ -20,13 +20,20 @@ fn test_initialize() {
         contract,
     } = DIDContractTest::setup();
 
-    contract.initialize(
+    let did_document = contract.initialize(
         &admin,
         &did_method,
         &context,
         &verification_methods,
         &services,
     );
+
+    assert_eq!(
+        did_document.did.len() as usize,
+        "did:chaincerts:".len() + ENCODED_MSI_LEN
+    );
+
+    assert_eq!(did_document.context, context);
 }
 
 #[test]
@@ -169,6 +176,35 @@ fn test_update_context() {
 }
 
 #[test]
+#[should_panic(expected = "HostError: Error(Contract, #3)")]
+fn test_update_context_with_empty_vec_should_panic() {
+    let DIDContractTest {
+        env,
+        admin,
+        did_method,
+        context,
+        verification_methods,
+        services,
+        contract,
+    } = DIDContractTest::setup();
+
+    contract.initialize(
+        &admin,
+        &did_method,
+        &context,
+        &verification_methods,
+        &services,
+    );
+
+    contract.update_did(
+        &admin,
+        &Option::Some(Vec::new(&env)),
+        &Option::None,
+        &Option::None,
+    );
+}
+
+#[test]
 fn test_update_verification_methods() {
     let DIDContractTest {
         env,
@@ -220,6 +256,35 @@ fn test_update_verification_methods() {
         formatted_verification_methods,
         contract.get_did().verification_method
     )
+}
+
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #4)")]
+fn test_update_verification_methods_with_empty_vec_should_panic() {
+    let DIDContractTest {
+        env,
+        admin,
+        did_method,
+        context,
+        verification_methods,
+        services,
+        contract,
+    } = DIDContractTest::setup();
+
+    contract.initialize(
+        &admin,
+        &did_method,
+        &context,
+        &verification_methods,
+        &services,
+    );
+
+    contract.update_did(
+        &admin,
+        &Option::None,
+        &Option::Some(Vec::new(&env)),
+        &Option::None,
+    );
 }
 
 #[test]

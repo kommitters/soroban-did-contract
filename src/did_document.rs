@@ -1,9 +1,10 @@
+use crate::error::ContractError;
 use crate::service::{self, Service};
 use crate::storage;
 use crate::verification_method::{
     add_verification_methods, VerificationMethod, VerificationMethodOutput,
 };
-use soroban_sdk::{contracttype, Env, String, Vec};
+use soroban_sdk::{contracttype, panic_with_error, Env, String, Vec};
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -26,6 +27,9 @@ pub fn set_initial_did_document(
     verification_methods: Vec<VerificationMethod>,
     services: Vec<Service>,
 ) -> DIDDocument {
+    validate_context(e, &context);
+    validate_verification_methods(e, &verification_methods);
+
     let mut did_document = DIDDocument {
         did: did_uri.clone(),
         context,
@@ -53,10 +57,14 @@ pub fn update_did_document(
     did_document: &mut DIDDocument,
 ) {
     if let Some(context) = context {
+        validate_context(e, &context);
+
         did_document.context = context;
     }
 
     if let Some(verification_methods) = verification_methods {
+        validate_verification_methods(e, &verification_methods);
+
         add_verification_methods(
             e,
             &verification_methods,
@@ -70,4 +78,16 @@ pub fn update_did_document(
     }
 
     storage::write_did_document(e, did_document);
+}
+
+fn validate_context(e: &Env, context: &Vec<String>) {
+    if context.is_empty() {
+        panic_with_error!(e, ContractError::EmptyContext);
+    }
+}
+
+fn validate_verification_methods(e: &Env, verification_methods: &Vec<VerificationMethod>) {
+    if verification_methods.is_empty() {
+        panic_with_error!(e, ContractError::EmptyVerificationMethods);
+    }
 }
