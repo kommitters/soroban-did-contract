@@ -46,6 +46,26 @@ pub fn set_initial_did_document(
     did_document
 }
 
+pub fn update_did_document(
+    e: &Env,
+    context: Option<Vec<String>>,
+    verification_methods: Option<Vec<VerificationMethod>>,
+    services: Option<Vec<Service>>,
+    did_document: &mut DidDocument,
+) {
+    if let Some(context) = context {
+        did_document.context = context;
+    }
+    if let Some(verification_methods) = verification_methods {
+        format_verification_method(e, &verification_methods, &did_document.did);
+    }
+    if let Some(services) = services {
+        did_document.services = services
+    }
+
+    storage::write_did_document(&e, did_document);
+}
+
 fn add_verification_methods(
     e: &Env,
     verification_methods: &Vec<VerificationMethod>,

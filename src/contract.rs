@@ -58,50 +58,20 @@ impl DIDTrait for DIDContract {
         }
         admin.require_auth();
 
-        let did_document = storage::read_did_document(&e);
+        let mut did_document = storage::read_did_document(&e);
+
+        did_document::update_did_document(
+            &e,
+            context,
+            verification_methods,
+            services,
+            &mut did_document,
+        );
 
         did_document
-
-        // let did_uri = storage::read_did_uri(&e);
-
-        // // Update only the fields that are not None
-        // if let Some(context) = context {
-        //     set_context(&e, &context)
-        // }
-        // if let Some(verification_methods) = verification_methods {
-        //     set_verification_methods(&e, &verification_methods, &did_uri)
-        // }
-        // if let Some(services) = services {
-        //     set_services(&e, &services, &did_uri)
-        // }
     }
 
     fn get_did(e: Env) -> DidDocument {
         storage::read_did_document(&e)
     }
-}
-
-fn set_context(e: &Env, context: &Vec<String>) {
-    if context.is_empty() {
-        panic_with_error!(e, ContractError::EmptyContext);
-    }
-    storage::write_context(e, context);
-}
-
-fn set_verification_methods(
-    e: &Env,
-    verification_methods: &Vec<VerificationMethod>,
-    did_uri: &String,
-) {
-    if verification_methods.is_empty() {
-        panic_with_error!(e, ContractError::EmptyVerificationMethods);
-    }
-
-    let new_verification_methods = format_verification_method(e, verification_methods, did_uri);
-    storage::write_verification_methods(e, &new_verification_methods);
-}
-
-fn set_services(e: &Env, services: &Vec<Service>, did_uri: &String) {
-    let new_services: Vec<Service> = format_services(e, services, did_uri);
-    storage::write_services(e, &new_services);
 }
