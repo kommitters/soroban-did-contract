@@ -59,29 +59,29 @@ fn test_initialize_an_already_initialized_contract() {
     );
 }
 
-// #[test]
-// #[should_panic(expected = "HostError: Error(Contract, #3)")]
-// fn test_initialize_with_empty_context() {
-//     let DIDContractTest {
-//         env,
-//         admin,
-//         did_method,
-//         context: _context,
-//         verification_methods,
-//         services,
-//         contract,
-//     } = DIDContractTest::setup();
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #3)")]
+fn test_initialize_with_empty_context() {
+    let DIDContractTest {
+        env,
+        admin,
+        did_method,
+        context: _context,
+        verification_methods,
+        services,
+        contract,
+    } = DIDContractTest::setup();
 
-//     let empty_context = vec![&env];
+    let empty_context = vec![&env];
 
-//     contract.initialize(
-//         &admin,
-//         &did_method,
-//         &empty_context,
-//         &verification_methods,
-//         &services,
-//     );
-// }
+    contract.initialize(
+        &admin,
+        &did_method,
+        &empty_context,
+        &verification_methods,
+        &services,
+    );
+}
 
 #[test]
 #[should_panic(expected = "HostError: Error(Contract, #4)")]
