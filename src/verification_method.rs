@@ -1,6 +1,6 @@
-use soroban_sdk::{contracttype, vec, Env, String, Vec};
-
+use crate::error::ContractError;
 use crate::{did_document::DIDDocument, did_uri};
+use soroban_sdk::{contracttype, panic_with_error, vec, Env, String, Vec};
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -44,9 +44,13 @@ pub fn add_verification_methods(
     did_uri: &String,
     did_document: &mut DIDDocument,
 ) {
+    if verification_methods.is_empty() {
+        panic_with_error!(e, ContractError::EmptyVerificationMethods);
+    }
+
     did_document.verification_method = format_verification_method(e, verification_methods, did_uri);
     clean_all_relationships(e, did_document);
- 
+
     for verification_method in verification_methods.iter() {
         for relationship in verification_method.verification_relationships {
             let value = vec![

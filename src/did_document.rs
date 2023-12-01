@@ -3,7 +3,7 @@ use crate::storage;
 use crate::verification_method::{
     add_verification_methods, VerificationMethod, VerificationMethodOutput,
 };
-use soroban_sdk::{contracttype, vec, Env, String, Vec};
+use soroban_sdk::{contracttype, Env, String, Vec};
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
