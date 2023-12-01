@@ -1,4 +1,4 @@
-use crate::did_document::DidDocument;
+use crate::did_document::DIDDocument;
 use crate::service::Service;
 use crate::verification_method::VerificationMethod;
 use soroban_sdk::{contracttype, Address, Env, String, Vec};
@@ -7,11 +7,11 @@ use soroban_sdk::{contracttype, Address, Env, String, Vec};
 #[contracttype]
 pub enum DataKey {
     Admin,               // Address
-    DidUri,              // String
+    DIDUri,              // String
     Context,             // Vec<String>
     VerificationMethods, // Vec<VerificationMethod>
     Services,            // Vec<Service>
-    DidDocument,         // DidDocument
+    DIDDocument,         // DIDDocument
 }
 
 pub fn has_admin(e: &Env) -> bool {
@@ -30,12 +30,12 @@ pub fn write_admin(e: &Env, id: &Address) {
 }
 
 pub fn read_did_uri(e: &Env) -> String {
-    let key = DataKey::DidUri;
+    let key = DataKey::DIDUri;
     e.storage().instance().get(&key).unwrap()
 }
 
 pub fn write_did_uri(e: &Env, did: &String) {
-    let key = DataKey::DidUri;
+    let key = DataKey::DIDUri;
     e.storage().instance().set(&key, did);
 }
 
@@ -69,12 +69,12 @@ pub fn write_services(e: &Env, services: &Vec<Service>) {
     e.storage().instance().set(&key, services);
 }
 
-pub fn read_did_document(e: &Env) -> DidDocument {
-    let key = DataKey::DidDocument;
+pub fn read_did_document(e: &Env) -> DIDDocument {
+    let key = DataKey::DIDDocument;
     e.storage().instance().get(&key).unwrap()
 }
 
-pub fn write_did_document(e: &Env, did_document: &DidDocument) {
-    let key = DataKey::DidDocument;
+pub fn write_did_document(e: &Env, did_document: &DIDDocument) {
+    let key = DataKey::DIDDocument;
     e.storage().instance().set(&key, did_document);
 }

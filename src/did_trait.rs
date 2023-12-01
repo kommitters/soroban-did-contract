@@ -1,4 +1,4 @@
-use crate::did_document::DidDocument;
+use crate::did_document::DIDDocument;
 use crate::service::Service;
 use crate::verification_method::VerificationMethod;
 use soroban_sdk::{Address, Env, String, Vec};
@@ -13,7 +13,7 @@ pub trait DIDTrait {
         context: Vec<String>,
         verification_methods: Vec<VerificationMethod>,
         services: Vec<Service>,
-    ) -> DidDocument;
+    ) -> DIDDocument;
 
     /// Updates the DID Document. This function can only be called by the admin.
     fn update_did(
@@ -22,8 +22,8 @@ pub trait DIDTrait {
         context: Option<Vec<String>>,
         verification_methods: Option<Vec<VerificationMethod>>,
         services: Option<Vec<Service>>,
-    ) -> DidDocument;
+    ) -> DIDDocument;
 
     /// Returns the DID Document.
-    fn get_did(e: Env) -> DidDocument;
+    fn get_did(e: Env) -> DIDDocument;
 }

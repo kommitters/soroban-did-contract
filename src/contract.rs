@@ -1,11 +1,11 @@
 use crate::did_document;
-use crate::did_document::DidDocument;
+use crate::did_document::DIDDocument;
 use crate::did_trait::DIDTrait;
 use crate::did_uri;
 use crate::error::ContractError;
-use crate::service::{format_services, Service};
+use crate::service::Service;
 use crate::storage;
-use crate::verification_method::{format_verification_method, VerificationMethod};
+use crate::verification_method::VerificationMethod;
 use soroban_sdk::{
     contract, contractimpl, contractmeta, panic_with_error, Address, Env, String, Vec,
 };
@@ -30,7 +30,7 @@ impl DIDTrait for DIDContract {
         context: Vec<String>,
         verification_methods: Vec<VerificationMethod>,
         services: Vec<Service>,
-    ) -> DidDocument {
+    ) -> DIDDocument {
         if storage::has_admin(&e) {
             panic_with_error!(e, ContractError::AlreadyInitialized);
         }
@@ -38,8 +38,8 @@ impl DIDTrait for DIDContract {
         storage::write_admin(&e, &admin);
 
         e.storage()
-        .instance()
-        .bump(LEDGERS_THRESHOLD, LEDGERS_TO_EXTEND);
+            .instance()
+            .bump(LEDGERS_THRESHOLD, LEDGERS_TO_EXTEND);
 
         let did_uri = did_uri::generate(&e, &did_method);
         did_document::set_initial_did_document(&e, did_uri, context, verification_methods, services)
@@ -51,7 +51,7 @@ impl DIDTrait for DIDContract {
         context: Option<Vec<String>>,
         verification_methods: Option<Vec<VerificationMethod>>,
         services: Option<Vec<Service>>,
-    ) -> DidDocument {
+    ) -> DIDDocument {
         let contract_admin = storage::read_admin(&e);
         if contract_admin != admin {
             panic_with_error!(e, ContractError::NotAuthorized)
@@ -71,7 +71,7 @@ impl DIDTrait for DIDContract {
         did_document
     }
 
-    fn get_did(e: Env) -> DidDocument {
+    fn get_did(e: Env) -> DIDDocument {
         storage::read_did_document(&e)
     }
 }

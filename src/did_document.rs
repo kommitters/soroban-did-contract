@@ -1,14 +1,13 @@
-use crate::did_uri;
-use crate::service::Service;
+use crate::service::{self, Service};
 use crate::storage;
 use crate::verification_method::{
-    VerificationMethod, VerificationMethodOutput, VerificationRelationship,
+    add_verification_methods, VerificationMethod, VerificationMethodOutput,
 };
 use soroban_sdk::{contracttype, vec, Env, String, Vec};
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct DidDocument {
+pub struct DIDDocument {
     pub did: String,
     pub context: Vec<String>,
     pub verification_method: Vec<VerificationMethodOutput>,
@@ -26,17 +25,17 @@ pub fn set_initial_did_document(
     context: Vec<String>,
     verification_methods: Vec<VerificationMethod>,
     services: Vec<Service>,
-) -> DidDocument {
-    let mut did_document = DidDocument {
+) -> DIDDocument {
+    let mut did_document = DIDDocument {
         did: did_uri.clone(),
-        context: context,
+        context,
         verification_method: Vec::new(e),
-        authentication: vec![e, String::from_slice(e, "")],
-        assertion_method: vec![e, String::from_slice(e, "")],
-        key_agreement: vec![e, String::from_slice(e, "")],
-        capability_invocation: vec![e, String::from_slice(e, "")],
-        capability_delegation: vec![e, String::from_slice(e, "")],
-        services: services,
+        authentication: Vec::new(e),
+        assertion_method: Vec::new(e),
+        key_agreement: Vec::new(e),
+        capability_invocation: Vec::new(e),
+        capability_delegation: Vec::new(e),
+        services: service::format_services(e, &services, &did_uri),
     };
 
     add_verification_methods(e, &verification_methods, &did_uri, &mut did_document);
@@ -51,80 +50,24 @@ pub fn update_did_document(
     context: Option<Vec<String>>,
     verification_methods: Option<Vec<VerificationMethod>>,
     services: Option<Vec<Service>>,
-    did_document: &mut DidDocument,
+    did_document: &mut DIDDocument,
 ) {
     if let Some(context) = context {
         did_document.context = context;
     }
+
     if let Some(verification_methods) = verification_methods {
-        format_verification_method(e, &verification_methods, &did_document.did);
+        add_verification_methods(
+            e,
+            &verification_methods,
+            &did_document.did.clone(),
+            did_document,
+        );
     }
+
     if let Some(services) = services {
-        did_document.services = services
+        did_document.services = service::format_services(e, &services, &did_document.did);
     }
 
-    storage::write_did_document(&e, did_document);
-}
-
-fn add_verification_methods(
-    e: &Env,
-    verification_methods: &Vec<VerificationMethod>,
-    did_uri: &String,
-    did_document: &mut DidDocument,
-) {
-    did_document.verification_method = format_verification_method(&e, &verification_methods, &did_uri);
-
-    for verification_method in verification_methods.iter() {
-        for relationship in verification_method.verification_relationships {
-            let value = vec![
-                e,
-                did_uri::concat_fragment(e, did_uri, &verification_method.id),
-            ];
-
-            format_relationship(did_document, relationship, value);
-        }
-    }
-}
-
-fn format_relationship(
-    did_document: &mut DidDocument,
-    relationship: VerificationRelationship,
-    value: Vec<String>,
-) {
-    match relationship {
-        VerificationRelationship::Authentication => {
-            did_document.authentication = value;
-        }
-        VerificationRelationship::AssertionMethod => {
-            did_document.assertion_method = value;
-        }
-        VerificationRelationship::KeyAgreement => {
-            did_document.key_agreement = value;
-        }
-        VerificationRelationship::CapabilityInvocation => {
-            did_document.capability_invocation = value;
-        }
-        VerificationRelationship::CapabilityDelegation => {
-            did_document.capability_delegation = value;
-        }
-    }
-}
-
-pub fn format_verification_method(
-    e: &Env,
-    verification_methods: &Vec<VerificationMethod>,
-    did_uri: &String,
-) -> Vec<VerificationMethodOutput> {
-    let mut new_verification_methods: Vec<VerificationMethodOutput> = Vec::new(e);
-
-    for verification_method in verification_methods.iter() {
-        new_verification_methods.push_back(VerificationMethodOutput {
-            id: did_uri::concat_fragment(e, did_uri, &verification_method.id),
-            type_: verification_method.type_,
-            controller: verification_method.controller,
-            public_key_multibase: verification_method.public_key_multibase,
-        });
-    }
-
-    new_verification_methods
+    storage::write_did_document(e, did_document);
 }
