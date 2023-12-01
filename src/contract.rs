@@ -35,6 +35,8 @@ impl DIDTrait for DIDContract {
             panic_with_error!(e, ContractError::AlreadyInitialized);
         }
 
+        validate_emtpy_values(&e, &context, &verification_methods);
+
         storage::write_admin(&e, &admin);
 
         e.storage()
@@ -73,5 +75,16 @@ impl DIDTrait for DIDContract {
 
     fn get_did(e: Env) -> DIDDocument {
         storage::read_did_document(&e)
+    }
+}
+
+
+fn validate_emtpy_values(e: &Env, context: &Vec<String>, verification_methods: &Vec<VerificationMethod>) {
+    if context.is_empty() {
+        panic_with_error!(e, ContractError::EmptyContext);
+    }
+
+    if verification_methods.is_empty() {
+        panic_with_error!(e, ContractError::EmptyVerificationMethods);
     }
 }
