@@ -264,7 +264,7 @@ In order to develop and test the smart contract, you need to install Rust and So
         --source SOURCE_ACCOUNT_SECRET_KEY \
         --rpc-url https://soroban-testnet.stellar.org:443 \
         --network-passphrase 'Test SDF Network ; September 2015' \
-        --wasm target/wasm32-unknown-unknown/release/soroban-did-contract.wasm
+        --wasm target/wasm32-unknown-unknown/release/soroban_did_contract.wasm
 
     CONTRACT_ID
     ```
