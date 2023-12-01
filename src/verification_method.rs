@@ -1,5 +1,5 @@
 use crate::{did_document::DIDDocument, did_uri};
-use soroban_sdk::{contracttype, vec, Env, String, Vec};
+use soroban_sdk::{contracttype, Env, String, Vec};
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -48,35 +48,28 @@ pub fn add_verification_methods(
 
     for verification_method in verification_methods.iter() {
         for relationship in verification_method.verification_relationships {
-            let value = vec![
-                e,
-                did_uri::concat_fragment(e, did_uri, &verification_method.id),
-            ];
-            format_relationship(did_document, relationship, value);
+            let key = did_uri::concat_fragment(e, did_uri, &verification_method.id);
+            add_relationship(did_document, relationship, key);
         }
     }
 }
 
-fn format_relationship(
+fn add_relationship(
     did_document: &mut DIDDocument,
     relationship: VerificationRelationship,
-    value: Vec<String>,
+    value: String,
 ) {
     match relationship {
         VerificationRelationship::Authentication => {
-            did_document.authentication = value;
+            did_document.authentication.push_back(value);
         }
-        VerificationRelationship::AssertionMethod => {
-            did_document.assertion_method = value;
-        }
-        VerificationRelationship::KeyAgreement => {
-            did_document.key_agreement = value;
-        }
+        VerificationRelationship::AssertionMethod => did_document.assertion_method.push_back(value),
+        VerificationRelationship::KeyAgreement => did_document.key_agreement.push_back(value),
         VerificationRelationship::CapabilityInvocation => {
-            did_document.capability_invocation = value;
+            did_document.capability_invocation.push_back(value)
         }
         VerificationRelationship::CapabilityDelegation => {
-            did_document.capability_delegation = value;
+            did_document.capability_delegation.push_back(value)
         }
     }
 }

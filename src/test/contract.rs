@@ -1,4 +1,4 @@
-use crate::test::setup::DIDContractTest;
+use crate::test::setup::{build_did_document, DIDContractTest};
 use crate::verification_method::{
     format_verification_method, VerificationMethod, VerificationMethodType,
     VerificationRelationship,
@@ -11,7 +11,7 @@ const ENCODED_MSI_LEN: usize = 24;
 #[test]
 fn test_initialize() {
     let DIDContractTest {
-        env: _env,
+        env,
         admin,
         did_method,
         context,
@@ -28,12 +28,20 @@ fn test_initialize() {
         &services,
     );
 
+    let expected_did_document = build_did_document(
+        &env,
+        &did_document.id,
+        &context,
+        &verification_methods,
+        &services,
+    );
+
     assert_eq!(
-        did_document.did.len() as usize,
+        did_document.id.len() as usize,
         "did:chaincerts:".len() + ENCODED_MSI_LEN
     );
 
-    assert_eq!(did_document.context, context);
+    assert_eq!(did_document, expected_did_document);
 }
 
 #[test]
@@ -250,7 +258,7 @@ fn test_update_verification_methods() {
     );
 
     let formatted_verification_methods =
-        format_verification_method(&env, &new_verification_methods, &did_document.did);
+        format_verification_method(&env, &new_verification_methods, &did_document.id);
 
     assert_eq!(
         formatted_verification_methods,
@@ -318,7 +326,7 @@ fn test_update_services() {
 
     let did_document = contract.get_did();
 
-    assert_eq!(did_document.services, new_services)
+    assert_eq!(did_document.service, new_services)
 }
 
 #[test]
