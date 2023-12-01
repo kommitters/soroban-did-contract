@@ -20,7 +20,7 @@ pub enum VerificationMethodType {
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct VerificationMethodOutput {
+pub struct VerificationMethodInDocument {
     pub id: String,
     pub type_: VerificationMethodType,
     pub controller: String,
@@ -93,11 +93,11 @@ pub fn format_verification_method(
     e: &Env,
     verification_methods: &Vec<VerificationMethod>,
     did_uri: &String,
-) -> Vec<VerificationMethodOutput> {
-    let mut new_verification_methods: Vec<VerificationMethodOutput> = Vec::new(e);
+) -> Vec<VerificationMethodInDocument> {
+    let mut new_verification_methods: Vec<VerificationMethodInDocument> = Vec::new(e);
 
     for verification_method in verification_methods.iter() {
-        new_verification_methods.push_back(VerificationMethodOutput {
+        new_verification_methods.push_back(VerificationMethodInDocument {
             id: did_uri::concat_fragment(e, did_uri, &verification_method.id),
             type_: verification_method.type_,
             controller: verification_method.controller,

@@ -2,7 +2,7 @@ use crate::error::ContractError;
 use crate::service::{self, Service};
 use crate::storage;
 use crate::verification_method::{
-    add_verification_methods, VerificationMethod, VerificationMethodOutput,
+    add_verification_methods, VerificationMethod, VerificationMethodInDocument,
 };
 use soroban_sdk::{contracttype, panic_with_error, Env, String, Vec};
 
@@ -11,7 +11,7 @@ use soroban_sdk::{contracttype, panic_with_error, Env, String, Vec};
 pub struct DIDDocument {
     pub did: String,
     pub context: Vec<String>,
-    pub verification_method: Vec<VerificationMethodOutput>,
+    pub verification_method: Vec<VerificationMethodInDocument>,
     pub authentication: Vec<String>,
     pub assertion_method: Vec<String>,
     pub key_agreement: Vec<String>,
@@ -22,27 +22,27 @@ pub struct DIDDocument {
 
 pub fn set_initial_did_document(
     e: &Env,
-    did_uri: String,
-    context: Vec<String>,
-    verification_methods: Vec<VerificationMethod>,
-    services: Vec<Service>,
+    did_uri: &String,
+    context: &Vec<String>,
+    verification_methods: &Vec<VerificationMethod>,
+    services: &Vec<Service>,
 ) -> DIDDocument {
-    validate_context(e, &context);
-    validate_verification_methods(e, &verification_methods);
+    validate_context(e, context);
+    validate_verification_methods(e, verification_methods);
 
     let mut did_document = DIDDocument {
         did: did_uri.clone(),
-        context,
+        context: context.clone(),
         verification_method: Vec::new(e),
         authentication: Vec::new(e),
         assertion_method: Vec::new(e),
         key_agreement: Vec::new(e),
         capability_invocation: Vec::new(e),
         capability_delegation: Vec::new(e),
-        services: service::format_services(e, &services, &did_uri),
+        services: service::format_services(e, services, did_uri),
     };
 
-    add_verification_methods(e, &verification_methods, &did_uri, &mut did_document);
+    add_verification_methods(e, verification_methods, did_uri, &mut did_document);
 
     storage::write_did_document(e, &did_document);
 
@@ -51,30 +51,30 @@ pub fn set_initial_did_document(
 
 pub fn update_did_document(
     e: &Env,
-    context: Option<Vec<String>>,
-    verification_methods: Option<Vec<VerificationMethod>>,
-    services: Option<Vec<Service>>,
+    context: &Option<Vec<String>>,
+    verification_methods: &Option<Vec<VerificationMethod>>,
+    services: &Option<Vec<Service>>,
     did_document: &mut DIDDocument,
 ) {
     if let Some(context) = context {
-        validate_context(e, &context);
+        validate_context(e, context);
 
-        did_document.context = context;
+        did_document.context = context.clone();
     }
 
     if let Some(verification_methods) = verification_methods {
-        validate_verification_methods(e, &verification_methods);
+        validate_verification_methods(e, verification_methods);
 
         add_verification_methods(
             e,
-            &verification_methods,
+            verification_methods,
             &did_document.did.clone(),
             did_document,
         );
     }
 
     if let Some(services) = services {
-        did_document.services = service::format_services(e, &services, &did_document.did);
+        did_document.services = service::format_services(e, services, &did_document.did);
     }
 
     storage::write_did_document(e, did_document);

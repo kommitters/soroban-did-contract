@@ -1,5 +1,4 @@
-use crate::did_document;
-use crate::did_document::DIDDocument;
+use crate::did_document::{self, DIDDocument};
 use crate::did_trait::DIDTrait;
 use crate::did_uri;
 use crate::error::ContractError;
@@ -42,7 +41,13 @@ impl DIDTrait for DIDContract {
             .bump(LEDGERS_THRESHOLD, LEDGERS_TO_EXTEND);
 
         let did_uri = did_uri::generate(&e, &did_method);
-        did_document::set_initial_did_document(&e, did_uri, context, verification_methods, services)
+        did_document::set_initial_did_document(
+            &e,
+            &did_uri,
+            &context,
+            &verification_methods,
+            &services,
+        )
     }
 
     fn update_did(
@@ -62,9 +67,9 @@ impl DIDTrait for DIDContract {
 
         did_document::update_did_document(
             &e,
-            context,
-            verification_methods,
-            services,
+            &context,
+            &verification_methods,
+            &services,
             &mut did_document,
         );
 
