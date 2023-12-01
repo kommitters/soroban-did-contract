@@ -1,3 +1,5 @@
+use crate::did_document;
+use crate::did_document::DidDocument;
 use crate::did_trait::DIDTrait;
 use crate::did_uri;
 use crate::error::ContractError;
@@ -28,24 +30,19 @@ impl DIDTrait for DIDContract {
         context: Vec<String>,
         verification_methods: Vec<VerificationMethod>,
         services: Vec<Service>,
-    ) -> String {
+    ) -> DidDocument {
         if storage::has_admin(&e) {
             panic_with_error!(e, ContractError::AlreadyInitialized);
         }
+
         storage::write_admin(&e, &admin);
 
-        let did_uri = did_uri::generate(&e, &did_method);
-        storage::write_did_uri(&e, &did_uri);
-
-        set_context(&e, &context);
-        set_verification_methods(&e, &verification_methods, &did_uri);
-        set_services(&e, &services, &did_uri);
-
         e.storage()
-            .instance()
-            .bump(LEDGERS_THRESHOLD, LEDGERS_TO_EXTEND);
+        .instance()
+        .bump(LEDGERS_THRESHOLD, LEDGERS_TO_EXTEND);
 
-        did_uri
+        let did_uri = did_uri::generate(&e, &did_method);
+        did_document::set_initial_did_document(&e, did_uri, context, verification_methods, services)
     }
 
     fn update_did(
@@ -54,34 +51,33 @@ impl DIDTrait for DIDContract {
         context: Option<Vec<String>>,
         verification_methods: Option<Vec<VerificationMethod>>,
         services: Option<Vec<Service>>,
-    ) {
+    ) -> DidDocument {
         let contract_admin = storage::read_admin(&e);
         if contract_admin != admin {
             panic_with_error!(e, ContractError::NotAuthorized)
         }
         admin.require_auth();
 
-        let did_uri = storage::read_did_uri(&e);
+        let did_document = storage::read_did_document(&e);
 
-        // Update only the fields that are not None
-        if let Some(context) = context {
-            set_context(&e, &context)
-        }
-        if let Some(verification_methods) = verification_methods {
-            set_verification_methods(&e, &verification_methods, &did_uri)
-        }
-        if let Some(services) = services {
-            set_services(&e, &services, &did_uri)
-        }
+        did_document
+
+        // let did_uri = storage::read_did_uri(&e);
+
+        // // Update only the fields that are not None
+        // if let Some(context) = context {
+        //     set_context(&e, &context)
+        // }
+        // if let Some(verification_methods) = verification_methods {
+        //     set_verification_methods(&e, &verification_methods, &did_uri)
+        // }
+        // if let Some(services) = services {
+        //     set_services(&e, &services, &did_uri)
+        // }
     }
 
-    fn get_did(e: Env) -> (Vec<String>, String, Vec<VerificationMethod>, Vec<Service>) {
-        let context = storage::read_context(&e);
-        let did_uri = storage::read_did_uri(&e);
-        let verification_method = storage::read_verification_methods(&e);
-        let services = storage::read_services(&e);
-
-        (context, did_uri, verification_method, services)
+    fn get_did(e: Env) -> DidDocument {
+        storage::read_did_document(&e)
     }
 }
 
