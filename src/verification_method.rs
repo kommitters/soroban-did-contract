@@ -21,6 +21,15 @@ pub enum VerificationMethodType {
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
+pub struct VerificationMethodOutput {
+    pub id: String,
+    pub type_: VerificationMethodType,
+    pub controller: String,
+    pub public_key_multibase: String,
+}
+
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct VerificationMethod {
     pub id: String,
     pub type_: VerificationMethodType,

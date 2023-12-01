@@ -3,6 +3,7 @@
 
 mod base32;
 mod contract;
+mod did_document;
 mod did_trait;
 mod did_uri;
 mod error;

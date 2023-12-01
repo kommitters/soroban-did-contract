@@ -1,3 +1,4 @@
+use crate::did_document::DidDocument;
 use crate::service::Service;
 use crate::verification_method::VerificationMethod;
 use soroban_sdk::{contracttype, Address, Env, String, Vec};
@@ -10,6 +11,7 @@ pub enum DataKey {
     Context,             // Vec<String>
     VerificationMethods, // Vec<VerificationMethod>
     Services,            // Vec<Service>
+    DidDocument,         // DidDocument
 }
 
 pub fn has_admin(e: &Env) -> bool {
@@ -65,4 +67,14 @@ pub fn read_services(e: &Env) -> Vec<Service> {
 pub fn write_services(e: &Env, services: &Vec<Service>) {
     let key = DataKey::Services;
     e.storage().instance().set(&key, services);
+}
+
+pub fn read_did_document(e: &Env) -> DidDocument {
+    let key = DataKey::DidDocument;
+    e.storage().instance().get(&key).unwrap()
+}
+
+pub fn write_did_document(e: &Env, did_document: &DidDocument) {
+    let key = DataKey::DidDocument;
+    e.storage().instance().set(&key, did_document);
 }
