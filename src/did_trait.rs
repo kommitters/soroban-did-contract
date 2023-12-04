@@ -1,6 +1,6 @@
 use crate::did_document::DIDDocument;
 use crate::service::Service;
-use crate::verification_method::VerificationMethod;
+use crate::verification_method::VerificationMethodEntry;
 use soroban_sdk::{Address, Env, String, Vec};
 
 pub trait DIDTrait {
@@ -11,7 +11,7 @@ pub trait DIDTrait {
         admin: Address,
         did_method: String,
         context: Vec<String>,
-        verification_methods: Vec<VerificationMethod>,
+        verification_methods: Vec<VerificationMethodEntry>,
         services: Vec<Service>,
     ) -> DIDDocument;
 
@@ -20,7 +20,7 @@ pub trait DIDTrait {
         e: Env,
         admin: Address,
         context: Option<Vec<String>>,
-        verification_methods: Option<Vec<VerificationMethod>>,
+        verification_methods: Option<Vec<VerificationMethodEntry>>,
         services: Option<Vec<Service>>,
     ) -> DIDDocument;
 

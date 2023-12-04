@@ -4,7 +4,7 @@ use crate::did_uri;
 use crate::error::ContractError;
 use crate::service::Service;
 use crate::storage;
-use crate::verification_method::VerificationMethod;
+use crate::verification_method::VerificationMethodEntry;
 use soroban_sdk::{
     contract, contractimpl, contractmeta, panic_with_error, Address, Env, String, Vec,
 };
@@ -27,7 +27,7 @@ impl DIDTrait for DIDContract {
         admin: Address,
         did_method: String,
         context: Vec<String>,
-        verification_methods: Vec<VerificationMethod>,
+        verification_methods: Vec<VerificationMethodEntry>,
         services: Vec<Service>,
     ) -> DIDDocument {
         if storage::has_admin(&e) {
@@ -54,7 +54,7 @@ impl DIDTrait for DIDContract {
         e: Env,
         admin: Address,
         context: Option<Vec<String>>,
-        verification_methods: Option<Vec<VerificationMethod>>,
+        verification_methods: Option<Vec<VerificationMethodEntry>>,
         services: Option<Vec<Service>>,
     ) -> DIDDocument {
         let contract_admin = storage::read_admin(&e);
