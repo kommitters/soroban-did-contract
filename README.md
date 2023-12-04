@@ -16,7 +16,7 @@ The DID contract enables you to manage a Decentralized Identifier within the Sor
 
 - Create a DID.
 - Update the DID attributes.
-- Retrieve the DID document (in raw format).
+- Retrieve the DID document.
 
 ## Types
 
@@ -110,7 +110,7 @@ Extends the functionality of DIDs by providing detailed information about specif
 
 ### DIDDocument
 
-Represents a raw W3C DID document, which is a set of data that describes the DID subject.
+Represents a W3C DID document, which is a set of data that describes the DID subject.
 
 #### Attributes
 
@@ -191,7 +191,7 @@ fn initialize(
 ```
 
 #### Output
-Returns a raw DID document.
+Returns a DID document.
 
 #### Example
 
@@ -260,7 +260,7 @@ fn get_did(e: Env) -> DIDDocument;
 ```
 
 #### Output
-Returns a raw DID document.
+Returns a DID document.
 
 #### Example
 
@@ -338,7 +338,7 @@ fn update_did(
 ```
 
 #### Output
-Returns a raw DID document.
+Returns a DID document.
 
 #### Example
 
