@@ -39,7 +39,7 @@ Represents a cryptographic key or method used for verification purposes.
 
 | Name                     | Type                           | Values                                                      |
 | ------------------------ | ------------------------------ | ----------------------------------------------------------- |
-| `id`                     | `String`                       | Arbitrary identifier (e.g., `key-1`).                       |
+| `id`                     | `String`                       | Arbitrary identifier (e.g., `keys-1`).                       |
 | `type_`                  | `VerificationMethodType`       | See [VerificationMethodType](#verificationmethodtype).      |
 | `controller`             | `String`                       | If the DID URI is not provided, the DID URI from the contract is set as the controller.  |
 | `public_key_multibase`   | `String`                       | Public key encoded in Multibase format (Base58BTC).         |
@@ -50,8 +50,9 @@ Represents a cryptographic key or method used for verification purposes.
 {
   "id": "keys-1",
   "type_": "Ed25519VerificationKey2020",
+  "controller": "",
   "public_key_multibase": "z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ",
-  "verification_relationships": ["Authentication", "Assertion"]
+  "verification_relationships": ["Authentication", "AssertionMethod"]
 }
 ```
 
@@ -81,6 +82,68 @@ Extends the functionality of DIDs by providing detailed information about specif
 }
 ```
 
+### DIDDocument
+
+Represents a raw W3C DID document, which is a set of data that describes the DID subject.
+
+#### Attributes
+
+| Name                     | Type                           | Values                           |
+| ------------------------ | ------------------------------ | ---------------------------------|
+| `id`                     | `String`                       | DID URI generated on initialization.            |
+| `context`                | `Vec<String>`                  | List of URLs defining W3C DID spec version and verification method suites. |
+| `verification_method`    | `Vec<VerificationMethodInDocument>` | List of [VerificationMethodInDocument](#verificationmethodindocument). |
+| `authentication`         | `Vec<String>`                  | List of verification method ids for authentication. |
+| `assertion_method`       | `Vec<String>`                  | List of verification method ids for assertion. |
+| `key_agreement`          | `Vec<String>`                  | List of verification method ids for key agreement. |
+| `capability_invocation`  | `Vec<String>`                  | List of verification method ids for capability invocation. |
+| `capability_delegation`  | `Vec<String>`                  | List of verification method ids for capability delegation. |
+| `service`                | `Vec<Service>`                 | List of [Services](#service).      |
+
+### Example
+```bash
+{
+  "id": "did:chaincerts:vyfrxab6umfxddlzl62jktu7",
+  "context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/suites/ed25519-2020/v1",
+    "https://w3id.org/security/suites/x25519-2020/v1"
+  ],
+  "verification_method": [
+    {
+      "controller": "did:chaincerts:vyfrxab6umfxddlzl62jktu7",
+      "id": "did:chaincerts:vyfrxab6umfxddlzl62jktu7#keys-1",
+      "public_key_multibase": "z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ",
+      "type_": "Ed25519VerificationKey2020"
+    },
+    {
+      "controller": "did:chaincerts:vyfrxab6umfxddlzl62jktu7",
+      "id": "did:chaincerts:vyfrxab6umfxddlzl62jktu7#keys-2",
+      "public_key_multibase": "z6LSnL6WNE3cqZyWBqh9JTQ3DwWNNvXuNVD8oKZL8jdFyuWN",
+      "type_": "X25519KeyAgreementKey2020"
+    }
+  ],
+  "authentication": [
+    "did:chaincerts:vyfrxab6umfxddlzl62jktu7#keys-1"
+  ],
+  "assertion_method": [
+    "did:chaincerts:vyfrxab6umfxddlzl62jktu7#keys-1"
+  ],
+  "key_agreement": [
+    "did:chaincerts:vyfrxab6umfxddlzl62jktu7#keys-2"
+  ],
+  "capability_invocation": [],
+  "capability_delegation": [],
+  "service": [
+    {
+      "id": "did:chaincerts:vyfrxab6umfxddlzl62jktu7#chaincerts",
+      "service_endpoint": "https://chaincerts.co",
+      "type_": "LinkedDomains"
+    }
+  ]
+}
+```
+
 ## Functions
 
 ### Initialize
@@ -94,24 +157,11 @@ fn initialize(
     context: Vec<String>,
     verification_methods: Vec<VerificationMethod>,
     services: Vec<Service>
-) -> DID;
+) -> DIDDocument;
 ```
 
 #### Output
 Returns a raw DID document.
-
-```bash
-{
-  "did":"",
-  "context":[],
-  "authentication":[],
-  "assertionMethod":[],
-  "keyAgreement":[],
-  "capabilityInvocation":[],
-  "capabilityDelegation":[],
-  "services":[]
-}
-```
 
 #### Example
 
@@ -124,75 +174,63 @@ soroban contract invoke \
   -- \
   initialize \
   --admin ADMIN_PUBLIC_KEY \
-  --did_method '"chaincerts"' \
+  --did_method chaincerts \
   --services '[{"id": "chaincerts", "type_": "LinkedDomains", "service_endpoint": "https://chaincerts.co"}]' \
-  --verification_methods '[{"id": "keys-1", "type_": "Ed25519VerificationKey2020", "public_key_multibase": "z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ", "verification_relationships": ["Authentication", "Assertion"]}, {"id": "keys-2", "type_": "X25519KeyAgreementKey2020", "public_key_multibase": "z6LSnL6WNE3cqZyWBqh9JTQ3DwWNNvXuNVD8oKZL8jdFyuWN",  "verification_relationships": ["KeyAgreement"]}]' \
+  --verification_methods '[{"id": "keys-1", "type_": "Ed25519VerificationKey2020", "controller": "", "public_key_multibase": "z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ", "verification_relationships": ["Authentication", "AssertionMethod"]}, {"id": "keys-2", "type_": "X25519KeyAgreementKey2020", "controller": "", "public_key_multibase": "z6LSnL6WNE3cqZyWBqh9JTQ3DwWNNvXuNVD8oKZL8jdFyuWN", "verification_relationships": ["KeyAgreement"]}]' \
   --context '["https://www.w3.org/ns/did/v1", "https://w3id.org/security/suites/ed25519-2020/v1", "https://w3id.org/security/suites/x25519-2020/v1"]'
 
 # Output: DID DOCUMENT
 {
-  "did":"did:chaincerts:vyfrxab6umfxddlzl62jktu7",
-  "context":[
+  "id": "did:chaincerts:vyfrxab6umfxddlzl62jktu7",
+  "context": [
     "https://www.w3.org/ns/did/v1",
     "https://w3id.org/security/suites/ed25519-2020/v1",
     "https://w3id.org/security/suites/x25519-2020/v1"
   ],
-  "verificationMethod":[
+  "verification_method": [
     {
-      "id":"keys-1",
-      "controller":"did:chaincerts:vyfrxab6umfxddlzl62jktu7"
-      "type_":"Ed25519VerificationKey2020",
-      "public_key_multibase":"z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ",
+      "controller": "did:chaincerts:vyfrxab6umfxddlzl62jktu7",
+      "id": "did:chaincerts:vyfrxab6umfxddlzl62jktu7#keys-1",
+      "public_key_multibase": "z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ",
+      "type_": "Ed25519VerificationKey2020"
     },
     {
-      "id":"keys-2",
-      "controller":"did:chaincerts:vyfrxab6umfxddlzl62jktu7",
-      "type_":"X25519KeyAgreementKey2020",
-      "public_key_multibase":"z6LSnL6WNE3cqZyWBqh9JTQ3DwWNNvXuNVD8oKZL8jdFyuWN"
+      "controller": "did:chaincerts:vyfrxab6umfxddlzl62jktu7",
+      "id": "did:chaincerts:vyfrxab6umfxddlzl62jktu7#keys-2",
+      "public_key_multibase": "z6LSnL6WNE3cqZyWBqh9JTQ3DwWNNvXuNVD8oKZL8jdFyuWN",
+      "type_": "X25519KeyAgreementKey2020"
     }
-  ]
-  "authentication":[
+  ],
+  "authentication": [
     "did:chaincerts:vyfrxab6umfxddlzl62jktu7#keys-1"
   ],
-  "assertionMethod":[
+  "assertion_method": [
     "did:chaincerts:vyfrxab6umfxddlzl62jktu7#keys-1"
   ],
-  "keyAgreement":[
+  "key_agreement": [
     "did:chaincerts:vyfrxab6umfxddlzl62jktu7#keys-2"
   ],
-  "services":[
+  "capability_invocation": [],
+  "capability_delegation": [],
+  "service": [
     {
-      "id":"Chaincerts",
-      "type_":"LinkedDomains",
-      "service_endpoint":"https://chaincerts.co"
+      "id": "did:chaincerts:vyfrxab6umfxddlzl62jktu7#chaincerts",
+      "service_endpoint": "https://chaincerts.co",
+      "type_": "LinkedDomains"
     }
   ]
 }
-
 ```
 
 ### Get DID
 Provides the DID document.
 
 ```rust
-fn get_did(e: Env) -> DID;
+fn get_did(e: Env) -> DIDDocument;
 ```
 
 #### Output
 Returns a raw DID document.
-
-```bash
-{
-  "did":"",
-  "context":[],
-  "authentication":[],
-  "assertionMethod":[],
-  "keyAgreement":[],
-  "capabilityInvocation":[],
-  "capabilityDelegation":[],
-  "services":[]
-}
-```
 
 #### Example
 
@@ -207,40 +245,42 @@ soroban contract invoke \
 
 # Output: DID DOCUMENT
 {
-  "did":"did:chaincerts:vyfrxab6umfxddlzl62jktu7",
-  "context":[
+  "id": "did:chaincerts:vyfrxab6umfxddlzl62jktu7",
+  "context": [
     "https://www.w3.org/ns/did/v1",
     "https://w3id.org/security/suites/ed25519-2020/v1",
     "https://w3id.org/security/suites/x25519-2020/v1"
   ],
-  "verificationMethod":[
+  "verification_method": [
     {
-      "id":"keys-1",
-      "controller":"did:chaincerts:vyfrxab6umfxddlzl62jktu7"
-      "type_":"Ed25519VerificationKey2020",
-      "public_key_multibase":"z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ",
+      "controller": "did:chaincerts:vyfrxab6umfxddlzl62jktu7",
+      "id": "did:chaincerts:vyfrxab6umfxddlzl62jktu7#keys-1",
+      "public_key_multibase": "z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ",
+      "type_": "Ed25519VerificationKey2020"
     },
     {
-      "id":"keys-2",
-      "controller":"did:chaincerts:vyfrxab6umfxddlzl62jktu7",
-      "type_":"X25519KeyAgreementKey2020",
-      "public_key_multibase":"z6LSnL6WNE3cqZyWBqh9JTQ3DwWNNvXuNVD8oKZL8jdFyuWN"
+      "controller": "did:chaincerts:vyfrxab6umfxddlzl62jktu7",
+      "id": "did:chaincerts:vyfrxab6umfxddlzl62jktu7#keys-2",
+      "public_key_multibase": "z6LSnL6WNE3cqZyWBqh9JTQ3DwWNNvXuNVD8oKZL8jdFyuWN",
+      "type_": "X25519KeyAgreementKey2020"
     }
-  ]
-  "authentication":[
+  ],
+  "authentication": [
     "did:chaincerts:vyfrxab6umfxddlzl62jktu7#keys-1"
   ],
-  "assertionMethod":[
+  "assertion_method": [
     "did:chaincerts:vyfrxab6umfxddlzl62jktu7#keys-1"
   ],
-  "keyAgreement":[
+  "key_agreement": [
     "did:chaincerts:vyfrxab6umfxddlzl62jktu7#keys-2"
   ],
-  "services":[
+  "capability_invocation": [],
+  "capability_delegation": [],
+  "service": [
     {
-      "id":"Chaincerts",
-      "type_":"LinkedDomains",
-      "service_endpoint":"https://chaincerts.co"
+      "id": "did:chaincerts:vyfrxab6umfxddlzl62jktu7#chaincerts",
+      "service_endpoint": "https://chaincerts.co",
+      "type_": "LinkedDomains"
     }
   ]
 }
@@ -250,7 +290,7 @@ soroban contract invoke \
 
 Updates the DID attributes in the storage for an initialized DID Contract. Only the admin account is authorized to invoke this function.
 
-The updateable DID attributes include `Context`, `VerificationMethods`, and `Services`.
+The updatable DID attributes include `Context`, `VerificationMethods`, and `Services`.
 
 You have the flexibility to update one or more attributes in the same invocation by providing the corresponding parameters. For attributes that are not intended to be updated, simply pass `None` in the respective parameter.
 
@@ -264,24 +304,11 @@ fn update_did(
     context: Option<Vec<String>>,
     verification_methods: Option<Vec<VerificationMethod>>,
     services: Option<Vec<Service>>
-) -> DID;
+) -> DIDDocument;
 ```
 
 #### Output
 Returns a raw DID document.
-
-```bash
-{
-  "did":"",
-  "context":[],
-  "authentication":[],
-  "assertionMethod":[],
-  "keyAgreement":[],
-  "capabilityInvocation":[],
-  "capabilityDelegation":[],
-  "services":[]
-}
-```
 
 #### Example
 
@@ -295,35 +322,38 @@ soroban contract invoke \
   update_did \
   --admin ADMIN_PUBLIC_KEY \
   --services '[{"id": "ChaincertsVault", "type_": "LinkedDomains", "service_endpoint": "https://vault.chaincerts.co"}]' \
-  --verification_methods '[{"id": "keys-1", "type_": "Ed25519VerificationKey2020", "public_key_multibase": "z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ", "verification_relationships": ["Authentication", "Assertion"]}]' \
+  --verification_methods '[{"id": "keys-1", "type_": "Ed25519VerificationKey2020", "controller": "", "public_key_multibase": "z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ", "verification_relationships": ["Authentication", "AssertionMethod"]}]' \
   --context '["https://www.w3.org/ns/did/v1", "https://w3id.org/security/suites/ed25519-2020/v1"]'
 
 # Output: DID DOCUMENT
 {
-  "did":"did:chaincerts:vyfrxab6umfxddlzl62jktu7",
-  "context":[
+  "id": "did:chaincerts:vyfrxab6umfxddlzl62jktu7",
+  "context": [
     "https://www.w3.org/ns/did/v1",
     "https://w3id.org/security/suites/ed25519-2020/v1"
   ],
-  "verificationMethod":[
+  "verification_method": [
     {
-      "id":"keys-1",
-      "controller":"did:chaincerts:vyfrxab6umfxddlzl62jktu7"
-      "type_":"Ed25519VerificationKey2020",
-      "public_key_multibase":"z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ",
+      "controller": "did:chaincerts:vyfrxab6umfxddlzl62jktu7",
+      "id": "did:chaincerts:vyfrxab6umfxddlzl62jktu7#keys-1",
+      "public_key_multibase": "z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ",
+      "type_": "Ed25519VerificationKey2020"
     }
-  ]
-  "authentication":[
+  ],
+  "authentication": [
     "did:chaincerts:vyfrxab6umfxddlzl62jktu7#keys-1"
   ],
-  "assertionMethod":[
+  "assertion_method": [
     "did:chaincerts:vyfrxab6umfxddlzl62jktu7#keys-1"
   ],
-  "services":[
+  "key_agreement": [],
+  "capability_invocation": [],
+  "capability_delegation": [],
+  "service": [
     {
-      "id":"ChaincertsVault",
-      "type_":"LinkedDomains",
-      "service_endpoint":"https://vault.chaincerts.co"
+      "id": "did:chaincerts:vyfrxab6umfxddlzl62jktu7#ChaincertsVault",
+      "service_endpoint": "https://vault.chaincerts.co",
+      "type_": "LinkedDomains"
     }
   ]
 }
