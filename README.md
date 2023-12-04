@@ -118,11 +118,7 @@ Represents a W3C DID document, which is a set of data that describes the DID sub
 | ------------------------ | ------------------------------ | ---------------------------------|
 | `id`                     | `String`                       | DID URI generated on initialization.            |
 | `context`                | `Vec<String>`                  | List of URLs defining W3C DID spec version and verification method suites. |
-<<<<<<< Updated upstream
-| `verification_method`    | `Vec<VerificationMethodInDocument>` | List of [VerificationMethodInDocument](#verificationmethodindocument). |
-=======
 | `verification_method`    | `Vec<VerificationMethod>`      | List of [VerificationMethods](#verificationmethod) |
->>>>>>> Stashed changes
 | `authentication`         | `Vec<String>`                  | List of verification method ids for authentication. |
 | `assertion_method`       | `Vec<String>`                  | List of verification method ids for assertion. |
 | `key_agreement`          | `Vec<String>`                  | List of verification method ids for key agreement. |
