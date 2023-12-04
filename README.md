@@ -32,8 +32,10 @@ Expresses the relationship between the DID subject and a verification method.
 > [!TIP]
 >  Allowed values: `Authentication`, `AssertionMethod`, `KeyAgreement`, `CapabilityInvocation`, `CapabilityDelegation`.
 
-### VerificationMethod
+### VerificationMethodEntry
 Represents a cryptographic key or method used for verification purposes.
+
+This type is used as parameter to set the verification methods in the [Initialize](#initialize) and [Update DID](#update-did) functions.
 
 #### Attributes
 
@@ -53,6 +55,30 @@ Represents a cryptographic key or method used for verification purposes.
   "controller": "",
   "public_key_multibase": "z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ",
   "verification_relationships": ["Authentication", "AssertionMethod"]
+}
+```
+
+### VerificationMethod
+Represents a cryptographic key or method used for verification purposes.
+
+This type is used to represent a verification method in the [DIDDocument](#diddocument) type.
+
+#### Attributes
+
+| Name                     | Type                           | Values                                                      |
+| ------------------------ | ------------------------------ | ----------------------------------------------------------- |
+| `id`                     | `String`                       | DID URI appended with an arbitrary identifier. |
+| `type_`                  | `VerificationMethodType`       | See [VerificationMethodType](#verificationmethodtype).      |
+| `controller`             | `String`                       | DID URI of the key controller.
+| `public_key_multibase`   | `String`                       | Public key encoded in Multibase format (Base58BTC).         |
+
+#### Example
+```bash
+{
+  "id": "did:chaincerts:565s4nk6hch3jxlqjtn3e4il#keys-1",
+  "type_": "Ed25519VerificationKey2020",
+  "controller": "did:chaincerts:565s4nk6hch3jxlqjtn3e4il",
+  "public_key_multibase": "z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ",
 }
 ```
 
@@ -92,7 +118,11 @@ Represents a raw W3C DID document, which is a set of data that describes the DID
 | ------------------------ | ------------------------------ | ---------------------------------|
 | `id`                     | `String`                       | DID URI generated on initialization.            |
 | `context`                | `Vec<String>`                  | List of URLs defining W3C DID spec version and verification method suites. |
+<<<<<<< Updated upstream
 | `verification_method`    | `Vec<VerificationMethodInDocument>` | List of [VerificationMethodInDocument](#verificationmethodindocument). |
+=======
+| `verification_method`    | `Vec<VerificationMethod>`      | List of [VerificationMethods](#verificationmethod) |
+>>>>>>> Stashed changes
 | `authentication`         | `Vec<String>`                  | List of verification method ids for authentication. |
 | `assertion_method`       | `Vec<String>`                  | List of verification method ids for assertion. |
 | `key_agreement`          | `Vec<String>`                  | List of verification method ids for key agreement. |
@@ -155,7 +185,7 @@ fn initialize(
     admin: Address,
     did_method: String,
     context: Vec<String>,
-    verification_methods: Vec<VerificationMethod>,
+    verification_methods: Vec<VerificationMethodEntry>,
     services: Vec<Service>
 ) -> DIDDocument;
 ```
@@ -302,7 +332,7 @@ fn update_did(
     e: Env,
     admin: Address,
     context: Option<Vec<String>>,
-    verification_methods: Option<Vec<VerificationMethod>>,
+    verification_methods: Option<Vec<VerificationMethodEntry>>,
     services: Option<Vec<Service>>
 ) -> DIDDocument;
 ```

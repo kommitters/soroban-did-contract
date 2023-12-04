@@ -1,6 +1,6 @@
 use crate::test::setup::{build_did_document, DIDContractTest};
 use crate::verification_method::{
-    format_verification_method, VerificationMethod, VerificationMethodType,
+    format_verification_method, VerificationMethodEntry, VerificationMethodType,
     VerificationRelationship,
 };
 use soroban_sdk::{testutils::Address as _, vec, Address, String, Vec};
@@ -234,7 +234,7 @@ fn test_update_verification_methods() {
 
     let new_verification_methods = vec![
         &env,
-        VerificationMethod {
+        VerificationMethodEntry {
             id: String::from_slice(&env, "keys-1"),
             type_: VerificationMethodType::Ed25519VerificationKey2020,
             controller: String::from_slice(&env, ""),
