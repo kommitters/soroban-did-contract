@@ -90,10 +90,18 @@ pub fn format_verification_method(
     let mut new_verification_methods: Vec<VerificationMethodInDocument> = Vec::new(e);
 
     for verification_method in verification_methods.iter() {
+        let id = did_uri::concat_fragment(e, did_uri, &verification_method.id);
+
+        let controller = if verification_method.controller.len() == 0 {
+            did_uri.clone()
+        } else {
+            verification_method.controller
+        };
+
         new_verification_methods.push_back(VerificationMethodInDocument {
-            id: did_uri::concat_fragment(e, did_uri, &verification_method.id),
+            id,
             type_: verification_method.type_,
-            controller: verification_method.controller,
+            controller,
             public_key_multibase: verification_method.public_key_multibase,
         });
     }
