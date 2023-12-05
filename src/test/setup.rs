@@ -1,7 +1,9 @@
 use crate::contract::{DIDContract, DIDContractClient};
-use crate::service::{Service, ServiceType};
+use crate::did_document::DIDDocument;
+use crate::service::{self, Service, ServiceType};
 use crate::verification_method::{
-    VerificationMethod, VerificationMethodType, VerificationRelationship,
+    add_verification_methods, VerificationMethodEntry, VerificationMethodType,
+    VerificationRelationship,
 };
 use soroban_sdk::{testutils::Address as _, vec, Address, Env, String, Vec};
 
@@ -10,7 +12,7 @@ pub struct DIDContractTest<'a> {
     pub admin: Address,
     pub did_method: String,
     pub context: Vec<String>,
-    pub verification_methods: Vec<VerificationMethod>,
+    pub verification_methods: Vec<VerificationMethodEntry>,
     pub services: Vec<Service>,
     pub contract: DIDContractClient<'a>,
 }
@@ -29,7 +31,7 @@ impl<'a> DIDContractTest<'a> {
         ];
         let verification_methods = vec![
             &env,
-            VerificationMethod {
+            VerificationMethodEntry {
                 id: String::from_slice(&env, "keys-1"),
                 type_: VerificationMethodType::Ed25519VerificationKey2020,
                 controller: String::from_slice(&env, ""),
@@ -44,7 +46,7 @@ impl<'a> DIDContractTest<'a> {
                     VerificationRelationship::CapabilityInvocation,
                 ],
             },
-            VerificationMethod {
+            VerificationMethodEntry {
                 id: String::from_slice(&env, "keys-2"),
                 type_: VerificationMethodType::X25519KeyAgreementKey2020,
                 controller: String::from_slice(&env, ""),
@@ -54,7 +56,7 @@ impl<'a> DIDContractTest<'a> {
                 ),
                 verification_relationships: vec![&env, VerificationRelationship::KeyAgreement],
             },
-            VerificationMethod {
+            VerificationMethodEntry {
                 id: String::from_slice(&env, "keys-3"),
                 type_: VerificationMethodType::Ed25519VerificationKey2020,
                 controller: String::from_slice(&env, "did:chaincerts:ujonoldr6vfinvl3a32su5lw"),
@@ -90,4 +92,28 @@ impl<'a> DIDContractTest<'a> {
             contract,
         }
     }
+}
+
+pub fn build_did_document(
+    e: &Env,
+    did_uri: &String,
+    context: &Vec<String>,
+    verification_methods: &Vec<VerificationMethodEntry>,
+    services: &Vec<Service>,
+) -> DIDDocument {
+    let mut did_document = DIDDocument {
+        id: did_uri.clone(),
+        context: context.clone(),
+        verification_method: Vec::new(e),
+        authentication: Vec::new(e),
+        assertion_method: Vec::new(e),
+        key_agreement: Vec::new(e),
+        capability_invocation: Vec::new(e),
+        capability_delegation: Vec::new(e),
+        service: service::format_services(e, services, did_uri),
+    };
+
+    add_verification_methods(e, verification_methods, did_uri, &mut did_document);
+
+    did_document
 }

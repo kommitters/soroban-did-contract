@@ -1,10 +1,9 @@
-use crate::service::format_services;
-use crate::test::setup::DIDContractTest;
+use crate::test::setup::{build_did_document, DIDContractTest};
 use crate::verification_method::{
-    format_verification_method, VerificationMethod, VerificationMethodType,
+    format_verification_method, VerificationMethodEntry, VerificationMethodType,
     VerificationRelationship,
 };
-use soroban_sdk::{testutils::Address as _, vec, Address, String};
+use soroban_sdk::{testutils::Address as _, vec, Address, String, Vec};
 
 // Length of the Method Specific ID (MSI) encoded in Base32
 const ENCODED_MSI_LEN: usize = 24;
@@ -12,7 +11,7 @@ const ENCODED_MSI_LEN: usize = 24;
 #[test]
 fn test_initialize() {
     let DIDContractTest {
-        env: _env,
+        env,
         admin,
         did_method,
         context,
@@ -21,7 +20,7 @@ fn test_initialize() {
         contract,
     } = DIDContractTest::setup();
 
-    let result = contract.initialize(
+    let did_document = contract.initialize(
         &admin,
         &did_method,
         &context,
@@ -29,10 +28,20 @@ fn test_initialize() {
         &services,
     );
 
+    let expected_did_document = build_did_document(
+        &env,
+        &did_document.id,
+        &context,
+        &verification_methods,
+        &services,
+    );
+
     assert_eq!(
-        result.len() as usize,
+        did_document.id.len() as usize,
         "did:chaincerts:".len() + ENCODED_MSI_LEN
     );
+
+    assert_eq!(did_document, expected_did_document);
 }
 
 #[test]
@@ -48,17 +57,12 @@ fn test_initialize_an_already_initialized_contract() {
         contract,
     } = DIDContractTest::setup();
 
-    let result = contract.initialize(
+    contract.initialize(
         &admin,
         &did_method,
         &context,
         &verification_methods,
         &services,
-    );
-
-    assert_eq!(
-        result.len() as usize,
-        "did:chaincerts:".len() + ENCODED_MSI_LEN
     );
 
     contract.initialize(
@@ -121,7 +125,7 @@ fn test_initialize_with_empty_verification_methods() {
 #[test]
 fn test_get_did() {
     let DIDContractTest {
-        env,
+        env: _,
         admin,
         did_method,
         context,
@@ -130,20 +134,15 @@ fn test_get_did() {
         contract,
     } = DIDContractTest::setup();
 
-    let uri = contract.initialize(
+    let did_document = contract.initialize(
         &admin,
         &did_method,
         &context,
         &verification_methods,
         &services,
     );
-    let new_services = format_services(&env, &services, &uri);
-    let new_verification_methods = format_verification_method(&env, &verification_methods, &uri);
 
-    assert_eq!(
-        contract.get_did(),
-        (context, uri, new_verification_methods, new_services)
-    )
+    assert_eq!(contract.get_did(), did_document)
 }
 
 #[test]
@@ -181,9 +180,36 @@ fn test_update_context() {
         &Option::None,
     );
 
-    let (context, _did_uri, _verification_methods, _services) = contract.get_did();
+    assert_eq!(contract.get_did().context, new_context)
+}
 
-    assert_eq!(context, new_context)
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #3)")]
+fn test_update_context_with_empty_vec_should_panic() {
+    let DIDContractTest {
+        env,
+        admin,
+        did_method,
+        context,
+        verification_methods,
+        services,
+        contract,
+    } = DIDContractTest::setup();
+
+    contract.initialize(
+        &admin,
+        &did_method,
+        &context,
+        &verification_methods,
+        &services,
+    );
+
+    contract.update_did(
+        &admin,
+        &Option::Some(Vec::new(&env)),
+        &Option::None,
+        &Option::None,
+    );
 }
 
 #[test]
@@ -198,7 +224,7 @@ fn test_update_verification_methods() {
         contract,
     } = DIDContractTest::setup();
 
-    let did_uri = contract.initialize(
+    let did_document = contract.initialize(
         &admin,
         &did_method,
         &context,
@@ -208,7 +234,7 @@ fn test_update_verification_methods() {
 
     let new_verification_methods = vec![
         &env,
-        VerificationMethod {
+        VerificationMethodEntry {
             id: String::from_slice(&env, "keys-1"),
             type_: VerificationMethodType::Ed25519VerificationKey2020,
             controller: String::from_slice(&env, ""),
@@ -232,11 +258,41 @@ fn test_update_verification_methods() {
     );
 
     let formatted_verification_methods =
-        format_verification_method(&env, &new_verification_methods, &did_uri);
+        format_verification_method(&env, &new_verification_methods, &did_document.id);
 
-    let (_context, _did_uri, verification_methods, _services) = contract.get_did();
+    assert_eq!(
+        formatted_verification_methods,
+        contract.get_did().verification_method
+    )
+}
 
-    assert_eq!(verification_methods, formatted_verification_methods)
+#[test]
+#[should_panic(expected = "HostError: Error(Contract, #4)")]
+fn test_update_verification_methods_with_empty_vec_should_panic() {
+    let DIDContractTest {
+        env,
+        admin,
+        did_method,
+        context,
+        verification_methods,
+        services,
+        contract,
+    } = DIDContractTest::setup();
+
+    contract.initialize(
+        &admin,
+        &did_method,
+        &context,
+        &verification_methods,
+        &services,
+    );
+
+    contract.update_did(
+        &admin,
+        &Option::None,
+        &Option::Some(Vec::new(&env)),
+        &Option::None,
+    );
 }
 
 #[test]
@@ -268,9 +324,9 @@ fn test_update_services() {
         &Option::Some(new_services.clone()),
     );
 
-    let (_context, _did_uri, _verification_methods, services) = contract.get_did();
+    let did_document = contract.get_did();
 
-    assert_eq!(services, new_services)
+    assert_eq!(did_document.service, new_services)
 }
 
 #[test]
