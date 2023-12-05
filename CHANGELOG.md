@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.0 (05.12.2023)
+- [Implement DID Document Structure and update storage](https://github.com/kommitters/soroban-did-contract/issues/20)
+- [Update README file](https://github.com/kommitters/soroban-did-contract/pull/17)
+- [[StepSecurity] Apply security best practices](https://github.com/kommitters/soroban-did-contract/pull/21)
+
 ## 0.1.0 (16.11.2023)
 - [Allow getting DID attributes](https://github.com/kommitters/soroban-did-contract/issues/10)
 - [Allow setting DID attributes](https://github.com/kommitters/soroban-did-contract/issues/9)
