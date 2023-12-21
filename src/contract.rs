@@ -9,8 +9,10 @@ use soroban_sdk::{
     contract, contractimpl, contractmeta, panic_with_error, Address, Env, String, Vec,
 };
 
-const LEDGERS_THRESHOLD: u32 = 1;
-const LEDGERS_TO_EXTEND: u32 = 535_000;
+// MAXIMUM ENTRY TTL:
+// 31 days, 12 ledger close per minute.
+// (12 * 60 * 24 * 31) - 1
+const LEDGERS_TO_EXTEND: u32 = 535_679;
 
 contractmeta!(
     key = "Description",
@@ -38,7 +40,7 @@ impl DIDTrait for DIDContract {
 
         e.storage()
             .instance()
-            .bump(LEDGERS_THRESHOLD, LEDGERS_TO_EXTEND);
+            .extend_ttl(LEDGERS_TO_EXTEND, LEDGERS_TO_EXTEND);
 
         let did_uri = did_uri::generate(&e, &did_method);
         did_document::set_initial_did_document(

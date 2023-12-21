@@ -11,7 +11,7 @@ pub fn generate(e: &Env, did_method: &String) -> String {
 }
 
 pub fn concat_fragment(e: &Env, did_uri: &String, id: &String) -> String {
-    let hash_str = String::from_slice(e, "#");
+    let hash_str = String::from_str(e, "#");
 
     let did_uri_len = did_uri.len() as usize;
     let id_len = id.len() as usize;
@@ -22,7 +22,7 @@ pub fn concat_fragment(e: &Env, did_uri: &String, id: &String) -> String {
     hash_str.copy_into_slice(&mut slice[did_uri_len..did_uri_len + 1]);
     id.copy_into_slice(&mut slice[(did_uri_len + 1)..combined_len]);
 
-    let id_string = String::from_slice(e, core::str::from_utf8(&slice[..combined_len]).unwrap());
+    let id_string = String::from_str(e, core::str::from_utf8(&slice[..combined_len]).unwrap());
 
     id_string
 }
@@ -31,14 +31,15 @@ fn get_random_bytes(e: &Env) -> [u8; 15] {
     let mut random_bytes = [0u8; 15];
 
     for byte in &mut random_bytes {
-        *byte = e.prng().u64_in_range(0..256) as u8;
+        let rand_number: u64 = e.prng().gen_range(0..256);
+        *byte = rand_number as u8;
     }
 
     random_bytes
 }
 
 fn concat_did_uri(e: &Env, did_method: &String, method_specific_id: &[u8]) -> String {
-    let prefix = String::from_slice(e, "did:");
+    let prefix = String::from_str(e, "did:");
     let prefix_len = prefix.len() as usize;
 
     let did_method_len = did_method.len() as usize;
@@ -58,5 +59,5 @@ fn concat_did_uri(e: &Env, did_method: &String, method_specific_id: &[u8]) -> St
     msi_bytes.copy_into_slice(&mut slice[did_uri_len..did_uri_len + msi_len]);
     let str_did_uri = core::str::from_utf8(slice[..did_uri_len + msi_len].as_ref()).unwrap();
 
-    String::from_slice(e, str_did_uri)
+    String::from_str(e, str_did_uri)
 }
