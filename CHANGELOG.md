@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.0 (21.12.2023)
+- [Bump `soroban-sdk` to `20.0.0`](https://github.com/kommitters/soroban-did-contract/issues/24)
+- [Extend Instance TTL on initialization to 31 days in ledgers](https://github.com/kommitters/soroban-did-contract/pull/25)
+
 ## 0.2.0 (05.12.2023)
 - [Implement DID Document Structure and update storage](https://github.com/kommitters/soroban-did-contract/issues/20)
 - [Update README file](https://github.com/kommitters/soroban-did-contract/pull/17)
