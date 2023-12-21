@@ -167,10 +167,10 @@ fn test_update_context() {
 
     let new_context = vec![
         &env,
-        String::from_slice(&env, "https://www.w3.org/ns/did/v1"),
-        String::from_slice(&env, "https://w3id.org/security/suites/ed25519-2020/v1"),
-        String::from_slice(&env, "https://w3id.org/security/suites/x25519-2020/v1"),
-        String::from_slice(&env, "https://www.example.com/context/v1"),
+        String::from_str(&env, "https://www.w3.org/ns/did/v1"),
+        String::from_str(&env, "https://w3id.org/security/suites/ed25519-2020/v1"),
+        String::from_str(&env, "https://w3id.org/security/suites/x25519-2020/v1"),
+        String::from_str(&env, "https://www.example.com/context/v1"),
     ];
 
     contract.update_did(
@@ -235,10 +235,10 @@ fn test_update_verification_methods() {
     let new_verification_methods = vec![
         &env,
         VerificationMethodEntry {
-            id: String::from_slice(&env, "keys-1"),
+            id: String::from_str(&env, "keys-1"),
             type_: VerificationMethodType::Ed25519VerificationKey2020,
-            controller: String::from_slice(&env, ""),
-            public_key_multibase: String::from_slice(
+            controller: String::from_str(&env, ""),
+            public_key_multibase: String::from_str(
                 &env,
                 "z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ",
             ),
@@ -350,7 +350,7 @@ fn test_update_did_with_invalid_admin() {
         &services,
     );
 
-    let invalid_admin = Address::random(&env);
+    let invalid_admin = Address::generate(&env);
     let new_services = vec![&env];
 
     contract.update_did(

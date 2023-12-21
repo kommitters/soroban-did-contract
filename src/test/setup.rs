@@ -21,21 +21,21 @@ impl<'a> DIDContractTest<'a> {
     pub fn setup() -> Self {
         let env: Env = Default::default();
         env.mock_all_auths();
-        let admin = Address::random(&env);
-        let did_method = String::from_slice(&env, "chaincerts");
+        let admin = Address::generate(&env);
+        let did_method = String::from_str(&env, "chaincerts");
         let context = vec![
             &env,
-            String::from_slice(&env, "https://www.w3.org/ns/did/v1"),
-            String::from_slice(&env, "https://w3id.org/security/suites/ed25519-2020/v1"),
-            String::from_slice(&env, "https://w3id.org/security/suites/x25519-2020/v1"),
+            String::from_str(&env, "https://www.w3.org/ns/did/v1"),
+            String::from_str(&env, "https://w3id.org/security/suites/ed25519-2020/v1"),
+            String::from_str(&env, "https://w3id.org/security/suites/x25519-2020/v1"),
         ];
         let verification_methods = vec![
             &env,
             VerificationMethodEntry {
-                id: String::from_slice(&env, "keys-1"),
+                id: String::from_str(&env, "keys-1"),
                 type_: VerificationMethodType::Ed25519VerificationKey2020,
-                controller: String::from_slice(&env, ""),
-                public_key_multibase: String::from_slice(
+                controller: String::from_str(&env, ""),
+                public_key_multibase: String::from_str(
                     &env,
                     "z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ",
                 ),
@@ -47,20 +47,20 @@ impl<'a> DIDContractTest<'a> {
                 ],
             },
             VerificationMethodEntry {
-                id: String::from_slice(&env, "keys-2"),
+                id: String::from_str(&env, "keys-2"),
                 type_: VerificationMethodType::X25519KeyAgreementKey2020,
-                controller: String::from_slice(&env, ""),
-                public_key_multibase: String::from_slice(
+                controller: String::from_str(&env, ""),
+                public_key_multibase: String::from_str(
                     &env,
                     "z6LSnL6WNE3cqZyWBqh9JTQ3DwWNNvXuNVD8oKZL8jdFyuWN",
                 ),
                 verification_relationships: vec![&env, VerificationRelationship::KeyAgreement],
             },
             VerificationMethodEntry {
-                id: String::from_slice(&env, "keys-3"),
+                id: String::from_str(&env, "keys-3"),
                 type_: VerificationMethodType::Ed25519VerificationKey2020,
-                controller: String::from_slice(&env, "did:chaincerts:ujonoldr6vfinvl3a32su5lw"),
-                public_key_multibase: String::from_slice(
+                controller: String::from_str(&env, "did:chaincerts:ujonoldr6vfinvl3a32su5lw"),
+                public_key_multibase: String::from_str(
                     &env,
                     "z6MkkD6nsbeFUQ28G5D7gPaAJgMk2o7SNQeepaZvf5Tbpjy6",
                 ),
@@ -74,9 +74,9 @@ impl<'a> DIDContractTest<'a> {
         let services = vec![
             &env,
             Service {
-                id: String::from_slice(&env, "chaincerts"),
+                id: String::from_str(&env, "chaincerts"),
                 type_: ServiceType::LinkedDomains,
-                service_endpoint: String::from_slice(&env, "https://chaincerts.co"),
+                service_endpoint: String::from_str(&env, "https://chaincerts.co"),
             },
         ];
 
