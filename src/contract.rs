@@ -30,9 +30,7 @@ impl DIDTrait for DIDContract {
         if storage::has_admin(&e) {
             panic_with_error!(e, ContractError::AlreadyInitialized);
         }
-
         storage::write_admin(&e, &admin);
-        storage::extend_ttl_to_instance(&e);
 
         let did_uri = did_uri::generate(&e, &did_method);
         did_document::set_initial_did_document(
