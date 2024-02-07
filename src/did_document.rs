@@ -45,6 +45,7 @@ pub fn set_initial_did_document(
     add_verification_methods(e, verification_methods, did_uri, &mut did_document);
 
     storage::write_did_document(e, &did_document);
+    storage::extend_ttl_to_did_document(e);
 
     did_document
 }
