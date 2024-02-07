@@ -9,11 +9,6 @@ use soroban_sdk::{
     contract, contractimpl, contractmeta, panic_with_error, Address, Env, String, Vec,
 };
 
-// MAXIMUM ENTRY TTL:
-// 31 days, 12 ledger close per minute.
-// (12 * 60 * 24 * 31) - 1
-const LEDGERS_TO_EXTEND: u32 = 535_679;
-
 contractmeta!(
     key = "Description",
     val = "Smart contract for decentralized identifiers (DIDs)",
@@ -35,12 +30,7 @@ impl DIDTrait for DIDContract {
         if storage::has_admin(&e) {
             panic_with_error!(e, ContractError::AlreadyInitialized);
         }
-
         storage::write_admin(&e, &admin);
-
-        e.storage()
-            .instance()
-            .extend_ttl(LEDGERS_TO_EXTEND, LEDGERS_TO_EXTEND);
 
         let did_uri = did_uri::generate(&e, &did_method);
         did_document::set_initial_did_document(
