@@ -25,10 +25,10 @@ pub fn write_admin(e: &Env, id: &Address) {
 
 pub fn read_did_document(e: &Env) -> DIDDocument {
     let key = DataKey::DIDDocument;
-    e.storage().instance().get(&key).unwrap()
+    e.storage().persistent().get(&key).unwrap()
 }
 
 pub fn write_did_document(e: &Env, did_document: &DIDDocument) {
     let key = DataKey::DIDDocument;
-    e.storage().instance().set(&key, did_document);
+    e.storage().persistent().set(&key, did_document);
 }
