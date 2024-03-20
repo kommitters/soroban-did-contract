@@ -360,3 +360,27 @@ fn test_update_did_with_invalid_admin() {
         &Option::Some(new_services),
     );
 }
+
+#[test]
+fn test_version() {
+    let DIDContractTest {
+        env: _env,
+        admin,
+        did_method,
+        context,
+        verification_methods,
+        services,
+        contract,
+    } = DIDContractTest::setup();
+
+    contract.initialize(
+        &admin,
+        &did_method,
+        &context,
+        &verification_methods,
+        &services,
+    );
+
+    let expected_version = String::from_str(&contract.env, "0.5.0");
+    assert_eq!(contract.version(), expected_version)
+}
