@@ -9,6 +9,8 @@ use soroban_sdk::{
     contract, contractimpl, contractmeta, panic_with_error, Address, BytesN, Env, String, Vec,
 };
 
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+
 contractmeta!(
     key = "Description",
     val = "Smart contract for decentralized identifiers (DIDs)",
@@ -80,6 +82,6 @@ impl DIDTrait for DIDContract {
     }
 
     fn version(e: Env) -> String {
-        String::from_str(&e, "0.5.0")
+        String::from_str(&e, VERSION)
     }
 }

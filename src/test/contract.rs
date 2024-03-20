@@ -364,7 +364,7 @@ fn test_update_did_with_invalid_admin() {
 #[test]
 fn test_version() {
     let DIDContractTest {
-        env: _env,
+        env,
         admin,
         did_method,
         context,
@@ -381,6 +381,7 @@ fn test_version() {
         &services,
     );
 
-    let expected_version = String::from_str(&contract.env, "0.5.0");
+    let pkg_version: &str = env!("CARGO_PKG_VERSION");
+    let expected_version = String::from_str(&env, pkg_version);
     assert_eq!(contract.version(), expected_version)
 }
