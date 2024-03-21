@@ -18,7 +18,6 @@ pub trait DIDTrait {
     /// Updates the DID Document. This function can only be called by the admin.
     fn update_did(
         e: Env,
-        admin: Address,
         context: Option<Vec<String>>,
         verification_methods: Option<Vec<VerificationMethodEntry>>,
         services: Option<Vec<Service>>,
