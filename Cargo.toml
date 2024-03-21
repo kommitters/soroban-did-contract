@@ -1,6 +1,6 @@
 [package]
 name = "soroban-did-contract"
-version = "0.4.0"
+version = "0.5.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -9,10 +9,10 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-soroban-sdk = "20.3.1"
+soroban-sdk = "20.5.0"
 
 [dev_dependencies]
-soroban-sdk = { version = "20.3.1", features = ["testutils"] }
+soroban-sdk = { version = "20.5.0", features = ["testutils"] }
 
 [profile.release]
 opt-level = "z"

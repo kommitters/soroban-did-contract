@@ -17,6 +17,8 @@ The DID contract enables you to manage a Decentralized Identifier within the Sor
 - Create a DID.
 - Update the DID attributes.
 - Retrieve the DID document.
+- Upgrade the contract.
+- Get the contract version.
 
 ## Types
 
@@ -326,7 +328,6 @@ Verification Methods and Context must not be empty; otherwise, a contract error 
 ```rust
 fn update_did(
     e: Env,
-    admin: Address,
     context: Option<Vec<String>>,
     verification_methods: Option<Vec<VerificationMethodEntry>>,
     services: Option<Vec<Service>>
@@ -346,7 +347,6 @@ soroban contract invoke \
   --network-passphrase 'Test SDF Network ; September 2015' \
   -- \
   update_did \
-  --admin ADMIN_PUBLIC_KEY \
   --services '[{"id": "ChaincertsVault", "type_": "LinkedDomains", "service_endpoint": "https://vault.chaincerts.co"}]' \
   --verification_methods '[{"id": "keys-1", "type_": "Ed25519VerificationKey2020", "controller": "", "public_key_multibase": "z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ", "verification_relationships": ["Authentication", "AssertionMethod"]}]' \
   --context '["https://www.w3.org/ns/did/v1", "https://w3id.org/security/suites/ed25519-2020/v1"]'
@@ -385,14 +385,59 @@ soroban contract invoke \
 }
 ```
 
+### Upgrade contract
+Replaces the current contract code with a new one.
+
+```rust
+fn upgrade(e: Env, new_wasm_hash: BytesN<32>);
+```
+
+#### Example
+
+```bash
+soroban contract invoke \
+  --id CONTRACT_ID \
+  --source SOURCE_ACCOUNT_SECRET_KEY \
+  --rpc-url https://soroban-testnet.stellar.org:443 \
+  --network-passphrase 'Test SDF Network ; September 2015' \
+  -- \
+  upgrade \
+  --new_wasm_hash 4e3e2a3e6286149775c308c8420fd87c9e5f655549073506f72b917577ef1e33
+
+```
+
+### Get contract version
+Returns the contract version.
+
+```rust
+fn version(e: Env) -> String;
+```
+
+#### Output
+Returns the contract version as a string.
+
+#### Example
+
+```bash
+soroban contract invoke \
+  --id CONTRACT_ID \
+  --source SOURCE_ACCOUNT_SECRET_KEY \
+  --rpc-url https://soroban-testnet.stellar.org:443 \
+  --network-passphrase 'Test SDF Network ; September 2015' \
+  -- \
+  version
+
+# Output: CONTRACT VERSION
+"0.5.0"
+```
+
 ## Contract Errors
 
 | Code | Error | Description |
 | --- | --- | --- |
 | 1 | `AlreadyInitialized` | Contract already initialized
-| 2 | `NotAuthorized` | Invoker is not the contract admin
-| 3 | `EmptyContext` | Context provided is an empty vector
-| 4 | `EmptyVerificationMethods` | Verification Methods provided is an empty vector
+| 2 | `EmptyContext` | Context provided is an empty vector
+| 3 | `EmptyVerificationMethods` | Verification Methods provided is an empty vector
 
 
 ## Development

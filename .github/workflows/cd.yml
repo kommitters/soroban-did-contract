@@ -33,7 +33,9 @@ jobs:
       - name: Code Tests
         run: |
           cargo test
-      - run: cargo install --locked --version 20.3.0 soroban-cli
+      - name: Install Soroban CLI (latest)
+        run: |
+          cargo install --locked soroban-cli
       - name: Contract Deployment did-contract to testnet
         run: |
           soroban contract deploy \
