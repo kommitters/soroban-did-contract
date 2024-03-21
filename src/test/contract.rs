@@ -3,7 +3,7 @@ use crate::verification_method::{
     format_verification_method, VerificationMethodEntry, VerificationMethodType,
     VerificationRelationship,
 };
-use soroban_sdk::{testutils::Address as _, vec, Address, String, Vec};
+use soroban_sdk::{vec, String, Vec};
 
 // Length of the Method Specific ID (MSI) encoded in Base32
 const ENCODED_MSI_LEN: usize = 24;
