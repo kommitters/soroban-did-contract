@@ -75,7 +75,7 @@ fn test_initialize_an_already_initialized_contract() {
 }
 
 #[test]
-#[should_panic(expected = "HostError: Error(Contract, #3)")]
+#[should_panic(expected = "HostError: Error(Contract, #2)")]
 fn test_initialize_with_empty_context() {
     let DIDContractTest {
         env,
@@ -99,7 +99,7 @@ fn test_initialize_with_empty_context() {
 }
 
 #[test]
-#[should_panic(expected = "HostError: Error(Contract, #4)")]
+#[should_panic(expected = "HostError: Error(Contract, #3)")]
 fn test_initialize_with_empty_verification_methods() {
     let DIDContractTest {
         env,
@@ -174,7 +174,6 @@ fn test_update_context() {
     ];
 
     contract.update_did(
-        &admin,
         &Option::Some(new_context.clone()),
         &Option::None,
         &Option::None,
@@ -184,7 +183,7 @@ fn test_update_context() {
 }
 
 #[test]
-#[should_panic(expected = "HostError: Error(Contract, #3)")]
+#[should_panic(expected = "HostError: Error(Contract, #2)")]
 fn test_update_context_with_empty_vec_should_panic() {
     let DIDContractTest {
         env,
@@ -205,7 +204,6 @@ fn test_update_context_with_empty_vec_should_panic() {
     );
 
     contract.update_did(
-        &admin,
         &Option::Some(Vec::new(&env)),
         &Option::None,
         &Option::None,
@@ -251,7 +249,6 @@ fn test_update_verification_methods() {
     ];
 
     contract.update_did(
-        &admin,
         &Option::None,
         &Option::Some(new_verification_methods.clone()),
         &Option::None,
@@ -267,7 +264,7 @@ fn test_update_verification_methods() {
 }
 
 #[test]
-#[should_panic(expected = "HostError: Error(Contract, #4)")]
+#[should_panic(expected = "HostError: Error(Contract, #3)")]
 fn test_update_verification_methods_with_empty_vec_should_panic() {
     let DIDContractTest {
         env,
@@ -288,7 +285,6 @@ fn test_update_verification_methods_with_empty_vec_should_panic() {
     );
 
     contract.update_did(
-        &admin,
         &Option::None,
         &Option::Some(Vec::new(&env)),
         &Option::None,
@@ -318,7 +314,6 @@ fn test_update_services() {
     let new_services = vec![&env];
 
     contract.update_did(
-        &admin,
         &Option::None,
         &Option::None,
         &Option::Some(new_services.clone()),
@@ -327,38 +322,6 @@ fn test_update_services() {
     let did_document = contract.get_did();
 
     assert_eq!(did_document.service, new_services)
-}
-
-#[test]
-#[should_panic(expected = "HostError: Error(Contract, #2)")]
-fn test_update_did_with_invalid_admin() {
-    let DIDContractTest {
-        env,
-        admin,
-        did_method,
-        context,
-        verification_methods,
-        services,
-        contract,
-    } = DIDContractTest::setup();
-
-    contract.initialize(
-        &admin,
-        &did_method,
-        &context,
-        &verification_methods,
-        &services,
-    );
-
-    let invalid_admin = Address::generate(&env);
-    let new_services = vec![&env];
-
-    contract.update_did(
-        &invalid_admin,
-        &Option::None,
-        &Option::None,
-        &Option::Some(new_services),
-    );
 }
 
 #[test]

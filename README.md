@@ -328,7 +328,6 @@ Verification Methods and Context must not be empty; otherwise, a contract error 
 ```rust
 fn update_did(
     e: Env,
-    admin: Address,
     context: Option<Vec<String>>,
     verification_methods: Option<Vec<VerificationMethodEntry>>,
     services: Option<Vec<Service>>
@@ -348,7 +347,6 @@ soroban contract invoke \
   --network-passphrase 'Test SDF Network ; September 2015' \
   -- \
   update_did \
-  --admin ADMIN_PUBLIC_KEY \
   --services '[{"id": "ChaincertsVault", "type_": "LinkedDomains", "service_endpoint": "https://vault.chaincerts.co"}]' \
   --verification_methods '[{"id": "keys-1", "type_": "Ed25519VerificationKey2020", "controller": "", "public_key_multibase": "z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ", "verification_relationships": ["Authentication", "AssertionMethod"]}]' \
   --context '["https://www.w3.org/ns/did/v1", "https://w3id.org/security/suites/ed25519-2020/v1"]'
@@ -438,9 +436,8 @@ soroban contract invoke \
 | Code | Error | Description |
 | --- | --- | --- |
 | 1 | `AlreadyInitialized` | Contract already initialized
-| 2 | `NotAuthorized` | Invoker is not the contract admin
-| 3 | `EmptyContext` | Context provided is an empty vector
-| 4 | `EmptyVerificationMethods` | Verification Methods provided is an empty vector
+| 2 | `EmptyContext` | Context provided is an empty vector
+| 3 | `EmptyVerificationMethods` | Verification Methods provided is an empty vector
 
 
 ## Development

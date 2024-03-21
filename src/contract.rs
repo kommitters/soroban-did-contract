@@ -46,16 +46,12 @@ impl DIDTrait for DIDContract {
 
     fn update_did(
         e: Env,
-        admin: Address,
         context: Option<Vec<String>>,
         verification_methods: Option<Vec<VerificationMethodEntry>>,
         services: Option<Vec<Service>>,
     ) -> DIDDocument {
         let contract_admin = storage::read_admin(&e);
-        if contract_admin != admin {
-            panic_with_error!(e, ContractError::NotAuthorized)
-        }
-        admin.require_auth();
+        contract_admin.require_auth();
 
         let mut did_document = storage::read_did_document(&e);
 
