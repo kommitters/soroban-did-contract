@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0 (21.03.2024)
+- Feature: [Upgradeable contract](https://github.com/kommitters/soroban-did-contract/issues/32).
+- [Remove `admin` from `update_did` function](https://github.com/kommitters/soroban-did-contract/pull/34)
+
 ## 0.4.0 (07.02.2024)
 - [Bump `soroban-sdk` to `20.3.1`](https://github.com/kommitters/soroban-did-contract/issues/28)
 - [Use persistent storage type for DIDDocument](https://github.com/kommitters/soroban-did-contract/issues/28)
