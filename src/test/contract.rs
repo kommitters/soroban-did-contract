@@ -203,11 +203,7 @@ fn test_update_context_with_empty_vec_should_panic() {
         &services,
     );
 
-    contract.update_did(
-        &Option::Some(Vec::new(&env)),
-        &Option::None,
-        &Option::None,
-    );
+    contract.update_did(&Option::Some(Vec::new(&env)), &Option::None, &Option::None);
 }
 
 #[test]
@@ -284,11 +280,7 @@ fn test_update_verification_methods_with_empty_vec_should_panic() {
         &services,
     );
 
-    contract.update_did(
-        &Option::None,
-        &Option::Some(Vec::new(&env)),
-        &Option::None,
-    );
+    contract.update_did(&Option::None, &Option::Some(Vec::new(&env)), &Option::None);
 }
 
 #[test]
