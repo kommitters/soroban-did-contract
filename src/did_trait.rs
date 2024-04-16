@@ -28,7 +28,7 @@ pub trait DIDTrait {
 
     /// Set the new contract admin.
     fn set_admin(e: Env, new_admin: Address);
-    
+
     /// Upgrades WASM code.
     fn upgrade(e: Env, new_wasm_hash: BytesN<32>);
 
