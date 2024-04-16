@@ -3,7 +3,7 @@ use crate::verification_method::{
     format_verification_method, VerificationMethodEntry, VerificationMethodType,
     VerificationRelationship,
 };
-use soroban_sdk::{vec, String, Vec};
+use soroban_sdk::{testutils::Address as _, Address, vec, String, Vec};
 
 // Length of the Method Specific ID (MSI) encoded in Base32
 const ENCODED_MSI_LEN: usize = 24;
@@ -314,6 +314,31 @@ fn test_update_services() {
     let did_document = contract.get_did();
 
     assert_eq!(did_document.service, new_services)
+}
+
+#[test]
+fn test_set_admin() {
+    let DIDContractTest {
+        env,
+        admin,
+        did_method,
+        context,
+        verification_methods,
+        services,
+        contract,
+    } = DIDContractTest::setup();
+
+    contract.initialize(
+        &admin,
+        &did_method,
+        &context,
+        &verification_methods,
+        &services,
+    );
+
+    let new_admin = Address::generate(&env);
+
+    contract.set_admin(&new_admin);
 }
 
 #[test]
