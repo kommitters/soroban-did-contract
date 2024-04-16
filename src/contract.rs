@@ -76,8 +76,7 @@ impl DIDTrait for DIDContract {
     }
 
     fn upgrade(e: Env, new_wasm_hash: BytesN<32>) {
-        let admin = storage::read_admin(&e);
-        admin.require_auth();
+        validate_admin(&e);
 
         e.deployer().update_current_contract_wasm(new_wasm_hash);
     }
