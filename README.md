@@ -17,6 +17,7 @@ The DID contract enables you to manage a Decentralized Identifier within the Sor
 - Create a DID.
 - Update the DID attributes.
 - Retrieve the DID document.
+- Set the contract admin.
 - Upgrade the contract.
 - Get the contract version.
 
@@ -383,6 +384,27 @@ soroban contract invoke \
     }
   ]
 }
+```
+
+### Set contract admin
+Replaces the current contract admin with a new one.
+
+```rust
+fn set_admin(e: Env, new_admin: Address);
+```
+
+#### Example
+
+```bash
+soroban contract invoke \
+  --id CONTRACT_ID \
+  --source SOURCE_ACCOUNT_SECRET_KEY \
+  --rpc-url https://soroban-testnet.stellar.org:443 \
+  --network-passphrase 'Test SDF Network ; September 2015' \
+  -- \
+  set_admin \
+  --new_admin GCWZBFEKWUGQKYLCLI5ULI4DTXLEA7LPC5QVB55NZPC7FY2NGMLP4YMC
+
 ```
 
 ### Upgrade contract
