@@ -392,7 +392,7 @@ Replaces the current contract admin with a new one. Also, you have the flexibili
 Verification Methods must not be empty; otherwise, a contract error will be thrown.
 
 ```rust
-fn set_admin(e: Env, new_admin: Address);
+fn set_admin(e: Env, new_admin: Address, new_verification_methods: Option<Vec<VerificationMethodEntry>>);
 ```
 
 #### Example
