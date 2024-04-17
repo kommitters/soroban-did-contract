@@ -389,6 +389,10 @@ soroban contract invoke \
 ### Set contract admin
 Replaces the current contract admin with a new one.
 
+You have the flexibility to update `VerificationMethods`, if it is not intended to be updated, simply pass `None`.
+
+Verification Methods must not be empty; otherwise, a contract error will be thrown.
+
 ```rust
 fn set_admin(e: Env, new_admin: Address);
 ```

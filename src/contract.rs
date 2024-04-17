@@ -69,10 +69,26 @@ impl DIDTrait for DIDContract {
         storage::read_did_document(&e)
     }
 
-    fn set_admin(e: Env, new_admin: Address) {
+    fn set_admin(
+        e: Env,
+        new_admin: Address,
+        new_verification_methods: Option<Vec<VerificationMethodEntry>>,
+    ) -> DIDDocument {
         validate_admin(&e);
 
+        let mut did_document = storage::read_did_document(&e);
+
+        did_document::update_did_document(
+            &e,
+            &Option::None,
+            &new_verification_methods,
+            &Option::None,
+            &mut did_document,
+        );
+
         storage::write_admin(&e, &new_admin);
+
+        did_document
     }
 
     fn upgrade(e: Env, new_wasm_hash: BytesN<32>) {

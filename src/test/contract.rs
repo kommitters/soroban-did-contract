@@ -328,7 +328,7 @@ fn test_set_admin() {
         contract,
     } = DIDContractTest::setup();
 
-    contract.initialize(
+    let did_document = contract.initialize(
         &admin,
         &did_method,
         &context,
@@ -338,7 +338,33 @@ fn test_set_admin() {
 
     let new_admin = Address::generate(&env);
 
-    contract.set_admin(&new_admin);
+    let new_verification_methods = vec![
+        &env,
+        VerificationMethodEntry {
+            id: String::from_str(&env, "keys-1"),
+            type_: VerificationMethodType::Ed25519VerificationKey2020,
+            controller: String::from_str(&env, ""),
+            public_key_multibase: String::from_str(
+                &env,
+                "z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ",
+            ),
+            verification_relationships: vec![
+                &env,
+                VerificationRelationship::Authentication,
+                VerificationRelationship::AssertionMethod,
+            ],
+        },
+    ];
+
+    contract.set_admin(&new_admin, &Option::Some(new_verification_methods.clone()));
+
+    let formatted_verification_methods =
+        format_verification_method(&env, &new_verification_methods, &did_document.id);
+
+    assert_eq!(
+        formatted_verification_methods,
+        contract.get_did().verification_method
+    )
 }
 
 #[test]
