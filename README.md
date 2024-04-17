@@ -387,9 +387,7 @@ soroban contract invoke \
 ```
 
 ### Set contract admin
-Replaces the current contract admin with a new one.
-
-You have the flexibility to update `VerificationMethods`, if it is not intended to be updated, simply pass `None`.
+Replaces the current contract admin with a new one. Also, you have the flexibility to update the `VerificationMethods`, if it is not intended to be updated, simply pass `None`.
 
 Verification Methods must not be empty; otherwise, a contract error will be thrown.
 
@@ -407,8 +405,8 @@ soroban contract invoke \
   --network-passphrase 'Test SDF Network ; September 2015' \
   -- \
   set_admin \
-  --new_admin GCWZBFEKWUGQKYLCLI5ULI4DTXLEA7LPC5QVB55NZPC7FY2NGMLP4YMC
-
+  --new_admin GCWZBFEKWUGQKYLCLI5ULI4DTXLEA7LPC5QVB55NZPC7FY2NGMLP4YMC \
+  --new_verification_methods '[{"id": "keys-1", "type_": "Ed25519VerificationKey2020", "controller": "", "public_key_multibase": "z6MkgpAN9rsVPXJ6DrrvxcsGzKwjdkVdvjNtbQsRiLfsqmuQ", "verification_relationships": ["Authentication", "AssertionMethod"]}]'
 ```
 
 ### Upgrade contract
