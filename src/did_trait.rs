@@ -26,6 +26,13 @@ pub trait DIDTrait {
     /// Returns the DID Document.
     fn get_did(e: Env) -> DIDDocument;
 
+    /// Sets the new contract admin and updates the verification methods if provided.
+    fn set_admin(
+        e: Env,
+        new_admin: Address,
+        new_verification_methods: Option<Vec<VerificationMethodEntry>>,
+    ) -> DIDDocument;
+
     /// Upgrades WASM code.
     fn upgrade(e: Env, new_wasm_hash: BytesN<32>);
 
