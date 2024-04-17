@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.0 (17.04.2024)
+- Feature: [Set new admin function](https://github.com/kommitters/soroban-did-contract/issues/37).
+
 ## 0.5.0 (21.03.2024)
 - Feature: [Upgradeable contract](https://github.com/kommitters/soroban-did-contract/issues/32).
 - [Remove `admin` from `update_did` function](https://github.com/kommitters/soroban-did-contract/pull/34)
