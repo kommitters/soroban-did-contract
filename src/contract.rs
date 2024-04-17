@@ -50,8 +50,7 @@ impl DIDTrait for DIDContract {
         verification_methods: Option<Vec<VerificationMethodEntry>>,
         services: Option<Vec<Service>>,
     ) -> DIDDocument {
-        let contract_admin = storage::read_admin(&e);
-        contract_admin.require_auth();
+        validate_admin(&e);
 
         let mut did_document = storage::read_did_document(&e);
 
@@ -70,9 +69,30 @@ impl DIDTrait for DIDContract {
         storage::read_did_document(&e)
     }
 
+    fn set_admin(
+        e: Env,
+        new_admin: Address,
+        new_verification_methods: Option<Vec<VerificationMethodEntry>>,
+    ) -> DIDDocument {
+        validate_admin(&e);
+
+        let mut did_document = storage::read_did_document(&e);
+
+        did_document::update_did_document(
+            &e,
+            &Option::None,
+            &new_verification_methods,
+            &Option::None,
+            &mut did_document,
+        );
+
+        storage::write_admin(&e, &new_admin);
+
+        did_document
+    }
+
     fn upgrade(e: Env, new_wasm_hash: BytesN<32>) {
-        let admin = storage::read_admin(&e);
-        admin.require_auth();
+        validate_admin(&e);
 
         e.deployer().update_current_contract_wasm(new_wasm_hash);
     }
@@ -80,4 +100,9 @@ impl DIDTrait for DIDContract {
     fn version(e: Env) -> String {
         String::from_str(&e, VERSION)
     }
+}
+
+fn validate_admin(e: &Env) {
+    let contract_admin = storage::read_admin(e);
+    contract_admin.require_auth();
 }
